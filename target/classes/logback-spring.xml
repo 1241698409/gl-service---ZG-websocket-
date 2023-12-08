@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="false">
+	<!-- 定义日志格式：时间[日志等级]类全名:日志行数 -打印信息 -->
+	<property name="LOG_PATTERN"
+		value="%d{yyyy-MM-dd HH:mm:ss.SSS}[%p]%c:%L -%m%n" />
+	<!--定义日志文件目录 -->
+	<property name="LOG_HOME" value="/gl-service" />
+	<!-- 定义控制台日志 -->
+	<appender name="CONSOLE"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 设置控制台日志输出格式 -->
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<!--定义文件日志 -->
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 日志路径/日期文件/文件名称.log -->
+			<FileNamePattern>${LOG_HOME}/log/gl-service-%d{yyyyMMdd}.log
+			</FileNamePattern>
+			<!-- 日志最大文件大小 -->
+			<totalSizeCap>100MB</totalSizeCap>
+			<!-- 日志最大保留天数 -->
+			<MaxHistory>15</MaxHistory>
+		</rollingPolicy>
+		<!-- 设置文件日志输出格式 -->
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+	<!-- 默认开发环境：打印控制台日志 -->
+	<springProfile name="default">
+		<root level="info">
+			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="FILE" />
+		</root>
+	</springProfile>
+	<!-- 生产环境：打印文件日志 -->
+	<springProfile name="prod">
+		<root level="info">
+			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="FILE" />
+		</root>
+	</springProfile>
+</configuration>

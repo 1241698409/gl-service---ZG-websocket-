@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="116ad274-ca1f-4f61-b78a-129bb9b7c4b9" name="Changes" comment="增加残厚侵蚀数据以及残厚数据历史趋势">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/controller/GlController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/controller/GlController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/excel/utils/ReadExcelUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/excel/utils/ReadExcelUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/mapper/db2/HtMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/mapper/db2/HtMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/ProcessService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/ProcessService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/ProcessServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/ProcessServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/utils/CollectionUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/utils/CollectionUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/db2/HtMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/db2/HtMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templateExcel/热电偶数据项.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templateExcel/热电偶数据项.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application-prod.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/controller/GlController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/controller/GlController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/mapper/db2/HtMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/mapper/db2/HtMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/ProcessService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/ProcessService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/ProcessServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/ProcessServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/mapper/db2/HtMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/db2/HtMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar.original" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Pull.Settings">
+    <option name="OPTIONS">
+      <set>
+        <option value="REBASE" />
+      </set>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="D:\Maven\mavenRepository" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../Maven/apache-maven-3.9.0-bin/apache-maven-3.9.0" />
+        <option name="useMavenConfig" value="true" />
+        <option name="userSettingsFile" value="D:\Maven\apache-maven-3.9.0-bin\apache-maven-3.9.0\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2S91MWuI9YzlAgMtbm1SF67aaHf" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/iDEA/DEMO/gl-service - BG",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "spring.configuration.checksum": "5f65f9a35337d0074b689c67f481ab72"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "db2"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\iDEA\DEMO\gl-service\src\main\resources\templateExcel" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.GlBootApplication">
+    <configuration name="generated-requests | 布料" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="7" requestIdentifier="布料" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 等温线历史" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="8" requestIdentifier="等温线历史" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 热负荷" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="3" requestIdentifier="热负荷" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 等温线" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" requestIdentifier="等温线" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 操业" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="9" requestIdentifier="操业" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 炉缸凝铁" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="5" requestIdentifier="炉缸凝铁" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 热负荷" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="3" requestIdentifier="热负荷" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 等温线" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" requestIdentifier="等温线" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 等温线历史" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="8" requestIdentifier="等温线历史" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | #11" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="11" requestIdentifier="#11" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | #12" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="12" requestIdentifier="#12" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | #13" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="13" requestIdentifier="#13" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 等温线#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="13" requestIdentifier="等温线#2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="generated-requests | 炉缸侵蚀" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" index="4" requestIdentifier="炉缸侵蚀" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="GlBootApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="gl-service - BG" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.baosight.gl.GlBootApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GlBootApplication (2)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="gl-service -ZG" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.baosight.gl.GlBootApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GlBootApplication (3)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="gl-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.baosight.gl.GlBootApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GlBootApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <option name="ACTIVE_PROFILES" />
+      <option name="ALTERNATIVE_JRE_PATH" value="D:\Java\JDK\jre" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <module name="gl-service -ZG" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.baosight.gl.GlBootApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="HTTP Request.generated-requests | 炉缸侵蚀" />
+      <item itemvalue="HTTP Request.generated-requests | 等温线#2" />
+      <item itemvalue="HTTP Request.generated-requests | #13" />
+      <item itemvalue="HTTP Request.generated-requests | #11" />
+      <item itemvalue="HTTP Request.generated-requests | #12" />
+      <item itemvalue="Spring Boot.GlBootApplication (3)" />
+      <item itemvalue="Spring Boot.GlBootApplication (2)" />
+      <item itemvalue="Spring Boot.GlBootApplication (1)" />
+      <item itemvalue="Spring Boot.GlBootApplication" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.generated-requests | 等温线#2" />
+        <item itemvalue="HTTP Request.generated-requests | #13" />
+        <item itemvalue="HTTP Request.generated-requests | #12" />
+        <item itemvalue="HTTP Request.generated-requests | #11" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\12416\AppData\Roaming\Subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="116ad274-ca1f-4f61-b78a-129bb9b7c4b9" name="Changes" comment="" />
+      <created>1688543936555</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1688543936555</updated>
+      <workItem from="1688543938020" duration="3904000" />
+      <workItem from="1691139827076" duration="898000" />
+      <workItem from="1691207756485" duration="2512000" />
+      <workItem from="1691371358527" duration="21238000" />
+      <workItem from="1691458115142" duration="12217000" />
+      <workItem from="1691631212188" duration="15295000" />
+      <workItem from="1691716679492" duration="7109000" />
+      <workItem from="1691809493051" duration="392000" />
+      <workItem from="1691977139700" duration="608000" />
+      <workItem from="1692080390952" duration="6390000" />
+      <workItem from="1692236488083" duration="5868000" />
+      <workItem from="1692251404594" duration="10524000" />
+      <workItem from="1692456273271" duration="426000" />
+      <workItem from="1692678702035" duration="9634000" />
+      <workItem from="1692756561223" duration="4782000" />
+      <workItem from="1693361740327" duration="2531000" />
+      <workItem from="1693371224288" duration="4373000" />
+      <workItem from="1693534983987" duration="3587000" />
+      <workItem from="1693809009856" duration="2096000" />
+      <workItem from="1693878932131" duration="2526000" />
+      <workItem from="1693964405329" duration="12259000" />
+      <workItem from="1694051061761" duration="7588000" />
+      <workItem from="1694137609214" duration="1996000" />
+      <workItem from="1694481143162" duration="3879000" />
+      <workItem from="1694567531475" duration="634000" />
+      <workItem from="1694653973365" duration="1818000" />
+      <workItem from="1694741301144" duration="16894000" />
+      <workItem from="1694827289924" duration="13571000" />
+      <workItem from="1694999648438" duration="10691000" />
+      <workItem from="1695086860816" duration="6092000" />
+      <workItem from="1695173162921" duration="6486000" />
+      <workItem from="1695184351048" duration="4770000" />
+      <workItem from="1695260493461" duration="1427000" />
+      <workItem from="1695347364789" duration="603000" />
+      <workItem from="1695432850543" duration="5329000" />
+      <workItem from="1695521044583" duration="9659000" />
+      <workItem from="1695604967674" duration="17530000" />
+      <workItem from="1695642205980" duration="33000" />
+      <workItem from="1695690632476" duration="5497000" />
+      <workItem from="1695777606607" duration="9725000" />
+      <workItem from="1695864051571" duration="2107000" />
+      <workItem from="1695951046107" duration="6344000" />
+      <workItem from="1696123041680" duration="5189000" />
+      <workItem from="1696209215495" duration="4691000" />
+      <workItem from="1696295895452" duration="5355000" />
+      <workItem from="1696468794397" duration="1536000" />
+      <workItem from="1696642287083" duration="1720000" />
+      <workItem from="1696727621163" duration="2032000" />
+      <workItem from="1696815539375" duration="623000" />
+      <workItem from="1696914085988" duration="602000" />
+      <workItem from="1696987823639" duration="6973000" />
+      <workItem from="1697084334333" duration="10266000" />
+      <workItem from="1697420046424" duration="12891000" />
+      <workItem from="1697521767609" duration="2594000" />
+      <workItem from="1697591803424" duration="1376000" />
+      <workItem from="1697678658156" duration="157000" />
+      <workItem from="1697678822496" duration="1216000" />
+      <workItem from="1697765578311" duration="621000" />
+      <workItem from="1698025495523" duration="907000" />
+      <workItem from="1698110374041" duration="596000" />
+      <workItem from="1698283170323" duration="1476000" />
+      <workItem from="1698393653534" duration="982000" />
+      <workItem from="1698462456219" duration="1891000" />
+      <workItem from="1698464419470" duration="5544000" />
+      <workItem from="1698650970349" duration="1826000" />
+      <workItem from="1698715282151" duration="1341000" />
+      <workItem from="1698817103705" duration="5612000" />
+      <workItem from="1698887880255" duration="1380000" />
+      <workItem from="1698989438759" duration="3428000" />
+      <workItem from="1699072649498" duration="604000" />
+      <workItem from="1699425475405" duration="2606000" />
+      <workItem from="1699493752166" duration="7043000" />
+      <workItem from="1699754386980" duration="286000" />
+      <workItem from="1699838762461" duration="6510000" />
+      <workItem from="1699847934357" duration="7929000" />
+      <workItem from="1699924459296" duration="8245000" />
+      <workItem from="1700014539369" duration="614000" />
+      <workItem from="1700097560686" duration="2301000" />
+      <workItem from="1700183178009" duration="11604000" />
+      <workItem from="1700456704398" duration="16213000" />
+      <workItem from="1700473102290" duration="252000" />
+      <workItem from="1700527876751" duration="11474000" />
+      <workItem from="1700614167729" duration="24887000" />
+      <workItem from="1700700253636" duration="25744000" />
+      <workItem from="1700786624890" duration="4914000" />
+      <workItem from="1701128807855" duration="5472000" />
+      <workItem from="1701218611371" duration="3170000" />
+      <workItem from="1701392670931" duration="5561000" />
+      <workItem from="1701411961803" duration="13583000" />
+      <workItem from="1701650699697" duration="1894000" />
+      <workItem from="1701737137550" duration="1423000" />
+      <workItem from="1701823867407" duration="1189000" />
+      <workItem from="1701909727802" duration="4026000" />
+      <workItem from="1701996758087" duration="9307000" />
+      <workItem from="1702029210214" duration="385000" />
+    </task>
+    <task id="LOCAL-00001" summary="第一次上传">
+      <created>1698468361907</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1698468361907</updated>
+    </task>
+    <task id="LOCAL-00002" summary="添加历史回放时间显示">
+      <created>1699840341922</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1699840341922</updated>
+    </task>
+    <task id="LOCAL-00003" summary="添加历史回放时间显示(去除打包文件)">
+      <created>1699844514646</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1699844514646</updated>
+    </task>
+    <task id="LOCAL-00004" summary="添加历史回放时间显示(去除打包文件)">
+      <created>1699924790398</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1699924790398</updated>
+    </task>
+    <task id="LOCAL-00005" summary="添加历史回放时间显示(去除打包文件)">
+      <created>1699926974398</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1699926974398</updated>
+    </task>
+    <task id="LOCAL-00006" summary="增加历史回放灵活性">
+      <created>1700469331854</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1700469331854</updated>
+    </task>
+    <task id="LOCAL-00007" summary="增加残厚侵蚀数据以及残厚数据历史趋势">
+      <created>1700730115730</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1700730115730</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="4d0ea215-f552-4a26-b15e-d3325287a2b1">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="true" />
+                </map>
+              </option>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="master" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/master" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="HEAD" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
+    <MESSAGE value="第一次上传" />
+    <MESSAGE value="添加历史回放时间显示" />
+    <MESSAGE value="添加历史回放时间显示(去除打包文件)" />
+    <MESSAGE value="增加历史回放灵活性" />
+    <MESSAGE value="增加残厚侵蚀数据以及残厚数据历史趋势" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加残厚侵蚀数据以及残厚数据历史趋势" />
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="java.lang.Double" memberName="value" />
+      </pinned-members>
+    </pin-to-top-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/gl_service$GlBootApplication.ic" NAME="GlBootApplication Coverage Results" MODIFIED="1695174696822" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+</project>

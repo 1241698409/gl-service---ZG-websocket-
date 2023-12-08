@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.baosight.gl.mapper.db1.ProcessMapper">
+
+	 <!-- 查询T_CUTOFF_RESULT表数据项 -->
+     <select id="queryCutoffResult" resultType="map">
+	     SELECT 
+		     RESULTID,
+		     CUTOFFID,
+		     CLOCK,
+		     TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK
+	     FROM 
+	     	IPLATURE.T_CUTOFF_RESULT 
+	     WHERE 
+	     	1 = 1
+     	 <if test="cutoffId != null and cutoffId != ''">
+		 	AND CUTOFFID = ${cutoffId}
+	     </if>
+	     <if test="resultId != null and resultId != ''">
+	      	AND RESULTID = ${resultId}
+	     </if>
+	     <if test="startTime != null and startTime != ''">
+	      	AND clock > #{startTime}
+	     </if>
+	     <if test="endTime != null and endTime != ''">
+	      	AND clock <![CDATA[<]]> #{endTime}
+	     </if>
+	     ${orderFetch}
+     </select>
+     
+     <!-- 根据resultId对应的时间区间，查询T_TS_TAP表 -->
+	 <select id="queryTapNoByTimes" resultType="map">
+		SELECT 
+			TAPNO,
+			STARTTIME,
+			ENDTIME 
+		FROM 
+			IPLATURE.T_TS_TAP 
+		WHERE 
+			ENDTIME is not null 
+		AND ENDTIME > (
+			select CLOCK - ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+		AND ENDTIME <![CDATA[<=]]> (
+			select CLOCK + ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+	 </select>
+	 
+	 <!-- 根据resultId对应的时间区间，查询CUTOFFID=3的T_CUTOFF_RESULT表 -->
+	 <select id="queryCutOff3ResultIdByTimes" resultType="map">
+		SELECT 
+			RESULTID,
+			CUTOFFID,
+			CLOCK
+		FROM 
+			IPLATURE.T_CUTOFF_RESULT 
+		WHERE 
+			CUTOFFID = 3
+		AND CLOCK > (
+			select CLOCK - ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+		AND CLOCK <![CDATA[<=]]> (
+			select CLOCK + ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+	 </select>
+	 
+	 <!-- 根据resultId对应的时间区间，查询T_MD_BODY_MAT_LAYER表 -->
+	 <select id="queryLayerClockByTimes" resultType="map">
+		SELECT clock FROM BENGANG.T_MD_BODY_MAT_LAYER
+	   	where clock > (
+			select CLOCK - ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+		AND clock <![CDATA[<]]> (
+			select CLOCK + ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+	   	group by clock 
+	 </select>
+	 
+	  <!-- 根据resultId对应的时间区间，查询T_MD_ER_VALUE_GROUP表 -->
+	  <select id="queryErodeSolidByTimes" resultType="map">
+		SELECT STARTDATE FROM IPLATURE.T_MD_ER_VALUE_GROUP
+	   	where STARTDATE > (
+			select CLOCK - ${number} day from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+		AND STARTDATE <![CDATA[<]]> (
+			select CLOCK + ${number} day from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+	  </select>
+	
+	 <select id="queryHeatMapResultId" resultType="int">
+	   	SELECT RESULTID FROM IPLATURE.T_CUTOFF_RESULT WHERE CUTOFFID = 1 
+	  	 AND clock in
+	  	  (
+	         (
+		       select clock as clock from IPLATURE.T_CUTOFF_RESULT where CUTOFFID = 1
+		          <if test="resultId != null and resultId != ''">
+			   		  AND RESULTID = #{resultId}
+			   	  </if> 
+			   	  <if test="time != null and time != ''">
+    				  AND CLOCK <![CDATA[<]]> #{time}
+    		  	  </if> 
+		              order by resultId desc fetch first ${rows} rows only
+	         )
+             union all
+	     	 (
+		       select (CLOCK - ${number} hour) as clock from IPLATURE.T_CUTOFF_RESULT where CUTOFFID = 1
+		          <if test="resultId != null and resultId != ''">
+			   		  AND RESULTID = #{resultId}
+			   	  </if> 
+			   	  <if test="time != null and time != ''">
+    				  AND CLOCK <![CDATA[<]]> #{time}
+    		  	  </if> 
+		              order by resultId desc fetch first ${rows} rows only
+	         )
+           )
+	 </select>
+</mapper>

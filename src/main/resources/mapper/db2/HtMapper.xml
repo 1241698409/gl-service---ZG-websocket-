@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.baosight.gl.mapper.db2.HtMapper">
+
+	<!-- 查询模拟料层数据项 -->
+	<select id="queryOreCoke" resultType="map">
+	select * from GL.T_MD_ORE_COKE 
+	where type = #{type} and clock = (select max(clock) from GL.T_MD_ORE_COKE) order by ROUND asc
+	</select>
+
+	<!-- 查询最新的气流场数据 -->
+	<select id="queryCurrentAirFlow" resultType="map">
+		select 
+		    ID,
+		    TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') as "INSERT_TIME",
+		    ORIGINAL_FILE_NAME,
+		    ORIGINAL_FILE_TIME,
+		    TARGET_FILE_PATH,
+		    TYPE,
+		    COUNT_START_TIME,
+		    COUNT_END_TIME,
+		    COUNT_TIME,
+		    ORIGINAL_MIN_VALUE,
+	        ORIGINAL_MAX_VALUE,
+	        COUNT_MIN_VALUE,
+	        COUNT_MAX_VALUE
+		from 
+			GL.AIRFLOW_FIELD_INDEX 
+		 where 
+		 	type = #{type}
+		  <if test="id != null and id != ''">
+			and ID = #{id}
+		  </if> 
+		order by id desc fetch first 1 rows only
+	</select>
+	
+	<!-- 插入最新的气流场数据 -->
+	<insert id="insertAirFlowIndex">
+	insert into 
+	AIRFLOW_FIELD_INDEX 
+		(
+			ORIGINAL_FILE_NAME,
+			ORIGINAL_FILE_TIME,
+			TARGET_FILE_PATH,
+			TYPE,
+			COUNT_START_TIME,
+			COUNT_END_TIME,
+			COUNT_TIME,
+			ORIGINAL_MIN_VALUE,
+	        ORIGINAL_MAX_VALUE,
+	        COUNT_MIN_VALUE,
+	        COUNT_MAX_VALUE
+		) 
+	values  
+		(
+			#{originalFileName},
+			#{originalFileTime},
+			#{targetFilePath},
+			#{type},
+			#{countStartTime},
+			#{countEndTime},
+			#{countTime},
+			#{originalMinValue},
+			#{originalMaxValue},
+			#{countMinValue},
+			#{countMaxValue}
+		)
+	</insert>
+	
+	<!-- 根据开始时间、结束时间查询AIRFLOW_FIELD_INDEX表 -->
+	<select id="queryAirFlowByTimes" resultType="map">
+		select 
+		    ID,
+		    TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') as "INSERT_TIME",
+		    ORIGINAL_FILE_NAME,
+		    ORIGINAL_FILE_TIME,
+		    TARGET_FILE_PATH,
+		    TYPE,
+		    COUNT_START_TIME,
+		    COUNT_END_TIME,
+		    COUNT_TIME,
+			ORIGINAL_MIN_VALUE,
+	        ORIGINAL_MAX_VALUE,
+	        COUNT_MIN_VALUE,
+	        COUNT_MAX_VALUE
+		from 
+			GL.AIRFLOW_FIELD_INDEX 
+		 where 
+		 	type = #{type} 
+	    and 
+	    	TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') > #{startTime}
+	    and 
+	    	TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') <![CDATA[<]]> #{endTime}
+	    order by ID asc
+	</select>
+	<!-- 插入最新的气流场数据 -->
+<!--	<insert id="setFilePath" useGeneratedKeys="true" KeyProperty="fileId">-->
+	<insert id="setFilePath" parameterType="java.util.HashMap">
+		insert into
+			IPLATURE.T_PLAYBACK
+		(
+			CREATTIME, FILEPATH
+		)
+		values
+			(
+		<!--TIMESTAMP (#{creatTime},'YYYY-MM-DD HH24:MI:SS'),#{filePath}-->
+	#{creatTime},#{filePath}
+    )
+</insert>
+<select id="JsonReader" resultType="map">
+select
+    ID,
+    CREATTIME, FILEPATH
+from
+    IPLATURE.T_PLAYBACK
+where
+	<!--CREATTIME = TIMESTAMP (#{creatTime},'YYYY-MM-DD HH24:MI:SS')-->
+	CREATTIME =#{creatTime}
+    </select>
+    </mapper>
