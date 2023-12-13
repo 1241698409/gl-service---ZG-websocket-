@@ -334,18 +334,28 @@
 	       		${HeatMapResultIdStr}
 	    </if>
     </select>
-	<!-- 热电偶数据项 -->
+	<!-- 热电偶数据项速度太慢下面优化 -->
+<!--	<select id="queryThermocoupleHis" resultType="map">-->
+<!--		SELECT-->
+<!--		${fieldStr},b.CLOCK-->
+<!--		FROM-->
+<!--		IPLATURE.${tableName} as a left join IPLATURE.T_CUTOFF_RESULT as b-->
+<!--		on-->
+<!--		a.RESULTID =b.RESULTID where b.CUTOFFID = 1-->
+<!--			<if test="time != null and time != ''">-->
+<!--				and b.CLOCK <![CDATA[<]]> TIMESTAMP(#{time}, 'YYYY-MM-DD-HH24:MI:SS.US')-->
+<!--			</if>-->
+<!--			order by a.resultId desc fetch first ${rows} rows only-->
+<!--	</select>-->
 	<select id="queryThermocoupleHis" resultType="map">
 		SELECT
 		${fieldStr},b.CLOCK
 		FROM
 		IPLATURE.${tableName} as a left join IPLATURE.T_CUTOFF_RESULT as b
 		on
-		a.RESULTID =b.RESULTID where b.CUTOFFID = 1
-			<if test="time != null and time != ''">
-				and b.CLOCK <![CDATA[<]]> TIMESTAMP(#{time}, 'YYYY-MM-DD-HH24:MI:SS.US')
-			</if>
-			order by a.resultId desc fetch first ${rows} rows only
+		a.RESULTID =b.RESULTID WHERE a.RESULTID IN
+			${ResultIdStr}
+		order by a.RESULTID desc
 	</select>
 <!--     <select id="queryHeatMapHistory" resultType="map">-->
 <!--     	SELECT -->
