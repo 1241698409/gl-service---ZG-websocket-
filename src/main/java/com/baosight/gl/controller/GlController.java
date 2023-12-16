@@ -877,15 +877,16 @@ public class GlController {
 
             // 设置参数
             HashMap paramsMap = new HashMap<>();
-            paramsMap.put("cutoffId", 1);
             paramsMap.put("rows", rows);
             paramsMap.put("time", time);
-            paramsMap.put("endTime", time);
             paramsMap.put("isotherm", "isotherm");
             // 处理表名到paramsMap集合
             paramsMap.put("tableName", BlastFurnaceTable);
             // 获取查询字段
             paramsMap.put("fieldStr", BlastFurnaceField);
+            //查询趋势对应的ResultId
+            paramsMap.put("cutoffId", 1);
+            paramsMap.put("endTime", time);
             paramsMap.put("orderFetch", "order by resultId desc fetch first " + rows + " rows only");
             // 声明HeatMapResultIdList集合
             List<Integer> MapResultIdList = new ArrayList();
@@ -1094,29 +1095,29 @@ public class GlController {
             HashMap paramsMap = new HashMap<>();
             paramsMap.put("rows", 1);
             paramsMap.put("resultId", resultId);
-            // 查询炉身静压数据项：T_CUTOFF_RESULT_AVG_1
+            // 查询炉身静压数据项：T_CUTOFF_RESULT_AVG_2
             List<HashMap> PressureList_1 = glService.queryStaticPressure(paramsMap);
             HashMap PressureMap_1 = PressureList_1.get(0);
             // 查询冷却板供水压力数据项：T_CUTOFF_RESULT_AVG_1
 //			List<HashMap> PressureList_2 = glService.querySupplyPressure1(paramsMap);
 //			HashMap PressureMap_2 = PressureList_2.get(0);
 //			 查询冷却板供水压力数据项：T_CUTOFF_RESULT_AVG_2
-            List<HashMap> PressureList_3 = glService.querySupplyPressure2(paramsMap);
-            HashMap PressureMap_3 = PressureList_3.get(0);
-            // 查询热风压力数据项：T_CUTOFF_RESULT_AVG_9
+//            List<HashMap> PressureList_3 = glService.querySupplyPressure2(paramsMap);
+//            HashMap PressureMap_3 = PressureList_3.get(0);
+            // 查询热风压力数据项：T_CUTOFF_RESULT_AVG_5
             List<HashMap> PressureList_4 = glService.queryHotPressure(paramsMap);
             HashMap PressureMap_4 = PressureList_4.get(0);
             // 查询炉顶压力数据项：T_CUTOFF_RESULT_AVG_1
-//			List<HashMap> PressureList_5 = glService.queryTopPressure(paramsMap);
-//			HashMap PressureMap_5 = PressureList_5.get(0);
+			List<HashMap> PressureList_5 = glService.queryTopPressure(paramsMap);
+			HashMap PressureMap_5 = PressureList_5.get(0);
             // 声明PressureMap集合
             HashMap PressureMap = new HashMap<>();
             // 处理压力数据项到PressureMap集合
             PressureMap.putAll(PressureMap_1);
 //			PressureMap.putAll(PressureMap_2);
-            PressureMap.putAll(PressureMap_3);
+//            PressureMap.putAll(PressureMap_3);
             PressureMap.putAll(PressureMap_4);
-//			PressureMap.putAll(PressureMap_5);
+			PressureMap.putAll(PressureMap_5);
             // 获取压力对应的excel数据项
             List<BlastFurnaceMode> BlastFurnaceList = processService.readBlastFurnaceExcel("炉身静压数据项.xlsx");
             // 根据：数据库数据项、excel数据项，处理压力数据格式
