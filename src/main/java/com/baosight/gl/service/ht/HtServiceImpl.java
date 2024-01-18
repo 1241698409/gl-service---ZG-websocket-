@@ -29,7 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("all")
 public class HtServiceImpl implements HtService {
 
-	@Autowired
+//	@Autowired
+	@Autowired(required = false)
 	HtMapper htMapper;
 
 	@Autowired

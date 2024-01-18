@@ -6,12 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.baosight.gl.controller.GlController;
 import com.baosight.gl.mapper.db2.HtMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,12 @@ public class ProcessServiceImpl implements ProcessService {
 
 	@Autowired
 	GlService glService;
-
+	@Autowired
+	GlController GlController;
 	@Autowired
 	ProcessMapper processMapper;
-	@Autowired
+//	@Autowired
+	@Autowired(required = false)
 	HtMapper htMapper;
 	@Value("${json.file.path}") // 从配置文件中获取文件路径
 	private String jsonFilePath;
@@ -836,7 +839,6 @@ public class ProcessServiceImpl implements ProcessService {
 		// 返回
 		return HeatMapResultIdStr;
 	}
-
 	@Override
 	public String JsonFileService(String stringJson) throws Exception {
 		String fileName = "json_" + LocalDate.now() + ".json"; // 根据当前日期生成文件名
@@ -857,12 +859,69 @@ public class ProcessServiceImpl implements ProcessService {
 		return "1";
 	}
 	@Override
+		public String JsonFileService(String stringJson,Integer resultid) throws Exception {
+		String fileName = "json_" + resultid+ ".json"; // 根据当前日期生成文件名
+		Path filePath = Paths.get(jsonFilePath, fileName); // 拼接文件路径
+		FileWriter fileWriter = new FileWriter(filePath.toString());
+		fileWriter.write(stringJson);
+		fileWriter.close();
+		HashMap HashMapParam =new HashMap();
+		//注意时间和后台时间的格式对应问题，不对应会出现数据格式转换异常  这样写，sql不能加TIMESTAMP
+		HashMapParam.put("creatTime", LocalDate.now()+" 00:00:00");
+		HashMapParam.put("resultid", resultid);
+//		或者下面这么坐
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//		String createTimeStr = LocalDateTime.now().format(formatter);
+//		HashMapParam.put("creatTime", createTimeStr);
+//		HashMapParam.put("creatTime", LocalDate.now());
+		HashMapParam.put("filePath", filePath.toString());
+		htMapper.setFilePath(HashMapParam);
+		return "1";
+	}
+	@Override
 	public String JsonReader (String time) throws Exception {
 		HashMap HashMapParam =new HashMap();
 		//注意时间和后台时间的格式对应问题，不对应会出现数据格式转换异常
 		HashMapParam.put("creatTime", LocalDate.now()+" 00:00:00");
+		HashMapParam.put("resultid", "");
 		HashMap JSONParam=htMapper.JsonReader(HashMapParam);
 		String jsonString = new String(Files.readAllBytes(Paths.get(JSONParam.get("FILEPATH").toString())));
 		return jsonString;
+	}
+	@Override
+	public String JsonReader (String time,Integer resultid) throws Exception {
+		HashMap HashMapParam =new HashMap();
+		//注意时间和后台时间的格式对应问题，不对应会出现数据格式转换异常
+		HashMapParam.put("creatTime", LocalDate.now()+" 00:00:00");
+		HashMapParam.put("resultid", resultid);
+		HashMap JSONParam=htMapper.JsonReader(HashMapParam);
+		String jsonString = new String(Files.readAllBytes(Paths.get(JSONParam.get("FILEPATH").toString())));
+		return jsonString;
+	}
+	@Override
+	public void differenceresultid() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper();
+		//查询数据库中所有的ResultId(用来查询等值图的id)
+		String resultid=GlController.queryResultIdbyTimes("1","","");
+		List<Integer> resultidValue = objectMapper.convertValue(
+				objectMapper.readTree(resultid).get("resultIds"),
+				new TypeReference<List<Integer>>() {}
+		);
+		//查询本地历史回放数据数据库
+		String localresultid=GlController.queryResultIdbyLocal("1","","");
+		List<Integer> localresultidValue = objectMapper.convertValue(
+				objectMapper.readTree(localresultid).get("resultIds"),
+				new TypeReference<List<Integer>>() {}
+		);
+		//将list转为HashSet使用时间复杂度更低的对比值
+		HashSet<Integer> set = new HashSet<>(localresultidValue);
+		List<Integer> difference = new ArrayList<>();
+		for (Integer num : resultidValue) {
+			if (!set.contains(num)) {
+				difference.add(num);
+				//将本地数据库中没有的数据插入
+				JsonFileService(GlController.queryThermocouple(num.toString()),num);
+			}
+		}
 	}
 }

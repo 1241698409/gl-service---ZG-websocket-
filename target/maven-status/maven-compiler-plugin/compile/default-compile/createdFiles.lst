@@ -8,12 +8,10 @@ com\baosight\gl\service\gl\ProcessService.class
 com\baosight\gl\service\ht\domain\Point.class
 com\baosight\gl\controller\HfController.class
 com\baosight\gl\excel\utils\ReadExcelUtils.class
-com\baosight\gl\service\ht\HtServiceImpl.class
 com\baosight\gl\utils\SystemUtils.class
 com\baosight\gl\constant\FormatConstant.class
 com\baosight\gl\utils\UuidUtils.class
 com\baosight\gl\utils\CollectionUtils.class
-com\baosight\gl\config\DataSourceConfig2.class
 com\baosight\gl\service\ht\GridsPointsServiceImpl.class
 com\baosight\gl\config\RestConfig.class
 com\baosight\gl\service\ht\HtService.class

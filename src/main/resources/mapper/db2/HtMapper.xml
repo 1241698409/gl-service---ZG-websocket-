@@ -10,8 +10,9 @@
 	</select>
 
 	<!-- 查询最新的气流场数据 -->
-	<select id="queryCurrentAirFlow" resultType="map">
-		select 
+	<select id="queryCurrentAirFlow" resultType="map" >
+		<!--SELECT TIMESTAMP('2023-12-01') AS timestamp_value FROM SYSIBM.SYSDUMMY1-->
+		select *
 		    ID,
 		    TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') as "INSERT_TIME",
 		    ORIGINAL_FILE_NAME,
@@ -25,13 +26,13 @@
 	        ORIGINAL_MAX_VALUE,
 	        COUNT_MIN_VALUE,
 	        COUNT_MAX_VALUE
-		from 
-			GL.AIRFLOW_FIELD_INDEX 
-		 where 
-		 	type = #{type}
+		from
+			GL.AIRFLOW_FIELD_INDEX
+		 where
+		TYPE = #{type}
 		  <if test="id != null and id != ''">
 			and ID = #{id}
-		  </if> 
+		  </if>
 		order by id desc fetch first 1 rows only
 	</select>
 	
@@ -70,7 +71,8 @@
 	
 	<!-- 根据开始时间、结束时间查询AIRFLOW_FIELD_INDEX表 -->
 	<select id="queryAirFlowByTimes" resultType="map">
-		select 
+		<!--SELECT TIMESTAMP('2023-12-01') AS timestamp_value FROM SYSIBM.SYSDUMMY1-->
+		select
 		    ID,
 		    TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') as "INSERT_TIME",
 		    ORIGINAL_FILE_NAME,
@@ -84,13 +86,13 @@
 	        ORIGINAL_MAX_VALUE,
 	        COUNT_MIN_VALUE,
 	        COUNT_MAX_VALUE
-		from 
-			GL.AIRFLOW_FIELD_INDEX 
-		 where 
-		 	type = #{type} 
-	    and 
+		from
+			GL.AIRFLOW_FIELD_INDEX
+		 where
+		 	type = #{type}
+	    and
 	    	TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') > #{startTime}
-	    and 
+	    and
 	    	TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') <![CDATA[<]]> #{endTime}
 	    order by ID asc
 	</select>
@@ -100,15 +102,27 @@
 		insert into
 			IPLATURE.T_PLAYBACK
 		(
-			CREATTIME, FILEPATH
+			ID,CREATTIME, FILEPATH
 		)
 		values
 			(
 		<!--TIMESTAMP (#{creatTime},'YYYY-MM-DD HH24:MI:SS'),#{filePath}-->
-	#{creatTime},#{filePath}
+		#{resultid},#{creatTime},#{filePath}
     )
 </insert>
+	<insert id="insertID" parameterType="java.util.HashMap">
+		insert into
+		IPLATURE.T_CUTOFF_RESULT
+		(
+		RESULTID,CUTOFFID,CLOCK
+		)
+		values
+		(
+		#{RESULTID},#{CUTOFFID},#{FORMATCLOCK}
+		)
+	</insert>
 <select id="JsonReader" resultType="map">
+	<!--SELECT TIMESTAMP('2023-12-01') AS timestamp_value FROM SYSIBM.SYSDUMMY1-->
 select
     ID,
     CREATTIME, FILEPATH
@@ -116,6 +130,32 @@ from
     IPLATURE.T_PLAYBACK
 where
 	<!--CREATTIME = TIMESTAMP (#{creatTime},'YYYY-MM-DD HH24:MI:SS')-->
-	CREATTIME =#{creatTime}
+	<!--CREATTIME =#{creatTime}-->
+	ID=#{resultid}
     </select>
+	<!-- 查询T_CUTOFF_RESULT表数据项 -->
+	<select id="queryCutoffResult" resultType="map">
+		SELECT
+		RESULTID
+		<!--  CUTOFFID,
+          CLOCK
+ TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK-->
+		FROM
+		IPLATURE.T_CUTOFF_RESULT
+		WHERE
+		1 = 1
+		<if test="cutoffId != null and cutoffId != ''">
+			AND CUTOFFID = ${cutoffId}
+		</if>
+		<if test="resultId != null and resultId != ''">
+			AND RESULTID = ${resultId}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND clock > #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND clock <![CDATA[<]]> #{endTime}
+		</if>
+		${orderFetch}
+	</select>
     </mapper>

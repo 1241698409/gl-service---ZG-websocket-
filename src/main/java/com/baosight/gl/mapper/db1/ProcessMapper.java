@@ -9,7 +9,7 @@ import com.baosight.gl.domain.CastIronItemValue;
 public interface ProcessMapper {
 
 	List<HashMap> queryCutoffResult(HashMap paramsMap);
-
+	List<HashMap> queryCutoffResultMap(HashMap paramsMap);
 	List<HashMap> queryTapNoByTimes(HashMap paramsMap);
 
 	List<HashMap> queryCutOff3ResultIdByTimes(HashMap paramsMap);

@@ -1,16 +1,26 @@
 package com.baosight.gl.controller;
 
 
-import java.math.BigDecimal;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.sql.Types;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import com.baosight.gl.mapper.db2.HtMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSON;
 import com.baosight.gl.domain.CastIronItemValue;
@@ -21,6 +31,9 @@ import com.baosight.gl.service.gl.ProcessService;
 import com.baosight.gl.utils.NumberFormatUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
@@ -39,6 +52,17 @@ public class GlController {
 
     @Autowired
     ProcessMapper processMapper;
+    @Autowired
+    HtMapper htMapper;
+//    @Autowired
+//    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    @Qualifier("db1JdbcTemplate")
+    JdbcTemplate jdbcTemplate1;
+    @Autowired
+    @Qualifier("db2JdbcTemplate")
+    JdbcTemplate jdbcTemplate2;
+    private LocalDateTime startTime;
 
     /**
      * 根据cutoffId、开始时间、结束时间，查询时间段内的ResultId集合
@@ -96,7 +120,166 @@ public class GlController {
             return "500";
         }
     }
+    /**
+     * 用多线程根据cutoffId、开始时间、结束时间，查询时间段内的ResultId集合
+     *
+     * @param cutoffId
+     * @param startTime
+     * @param endTime
+     */
+    @CrossOrigin
+    @PostMapping("/queryResultIdbyTimesOnThread")
+    public List<Integer> queryResultIdbyTimesOnThread(JdbcTemplate jdbcTemplate,String slag) {
+        String sql = "SELECT RESULTID FROM IPLATURE.T_CUTOFF_RESULT WHERE 1 = 1 AND CUTOFFID = 1 AND CLOCK BETWEEN ? AND ?";
+        LocalDateTime startDate = startTime==null?LocalDateTime.of(2024, 1, 1, 0, 0, 0):startTime; // 开始日期，这里以2020年1月1日为例
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime endDate = LocalDateTime.now(); // 当前日期时间
+        List<Integer> recordList = new CopyOnWriteArrayList<>(); // 线程安全的列表，用于保存查询结果
 
+        LocalDateTime currentMonth = startDate;
+        List<Thread> threads = new ArrayList<>(); // 用于保存线程对象
+
+        while (currentMonth.isBefore(endDate)) {
+            LocalDateTime nextMonth = currentMonth.plusMonths(1);
+            Object[] params = new Object[]{currentMonth.format(formatter), nextMonth.format(formatter)};
+            int[] types = new int[]{Types.VARCHAR, Types.VARCHAR};
+//注意在用第二个本地数据源的时候BETWEEN AND识别时间有问题，可能是时间格式timestamp的两种格式问题
+            Thread thread = new Thread(() -> {
+                List<Integer> batchRecords = jdbcTemplate.query(sql, params, types, (rs, rowNum) ->
+                     rs.getInt("RESULTID")
+                );
+
+                recordList.addAll(batchRecords);
+            });
+
+            threads.add(thread);
+            thread.start();
+
+            currentMonth = nextMonth;
+        }
+        if(slag=="1") {
+            //不能用最后一次查询的时间作为开始时间，应该是最后一条数据的时间作为开始时间（修改）
+            startTime = endDate;
+        }
+        // 等待所有线程执行完毕
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return recordList;
+    }
+    /**
+     * 根据cutoffId、开始时间、结束时间，查询时间段内的ResultId集合
+     *
+     * @param cutoffId
+     * @param startTime
+     * @param endTime
+     */
+    @CrossOrigin
+    @PostMapping("/queryResultIdbyLocal")
+    public String queryResultIdbyLocal(String cutoffId, String startTime, String endTime) {
+        try {
+            // 声明retMap集合
+            Map retMap = new LinkedHashMap();
+            // 声明resultIdRetList集合
+            List<Integer> resultIdRetList = new ArrayList<>();
+            // 设置参数
+            HashMap paramsMap = new HashMap<>();
+            paramsMap.put("cutoffId", cutoffId);
+            paramsMap.put("startTime", startTime);
+            paramsMap.put("endTime", endTime);
+            paramsMap.put("orderFetch", "order by resultId asc");
+            // 根据参数查询ResultId集合
+            List<HashMap> resultIdList = htMapper.queryCutoffResult(paramsMap);
+            // 判断时间段内是否存在resultId
+            if (resultIdList.size() == 0) {
+                // 处理startTimeValue、endTimeValue、resultIdRetList到retMap集合
+                retMap.put("startTime", startTime);
+                retMap.put("endTime", endTime);
+                retMap.put("size", resultIdRetList.size());
+                retMap.put("interval", "1min");
+                retMap.put("resultIds", resultIdRetList);
+                // 返回
+                return JSON.toJSONString(retMap);
+            }
+            // 遍历resultIdList集合
+            for (int i = 0; i < resultIdList.size(); i++) {
+                Integer resultId = Integer.valueOf(resultIdList.get(i).get("RESULTID").toString());
+                resultIdRetList.add(resultId);
+            }
+            // 获取开始时间
+            Object startTimeValue = resultIdList.get(0).get("FORMATCLOCK");
+            // 获取结束时间
+            Object endTimeValue = resultIdList.get(resultIdList.size() - 1).get("FORMATCLOCK");
+            // 处理startTimeValue、endTimeValue、resultIdRetList到retMap集合
+            retMap.put("startTime", startTimeValue);
+            retMap.put("endTime", endTimeValue);
+            retMap.put("size", resultIdRetList.size());
+            retMap.put("interval", "1min");
+            retMap.put("resultIds", resultIdRetList);
+            // 返回
+            return JSON.toJSONString(retMap);
+        } catch (Exception e) {
+            // 返回错误码
+            return "500";
+        }
+    }
+    /**
+     * ResultId、查询map
+     *
+     * @param cutoffId
+     * @param startTime
+     * @param endTime
+     */
+    @CrossOrigin
+    @PostMapping("/queryResultMap")
+    public String queryResultMap(String cutoffId, String startTime, String endTime,Integer resultId ) {
+        try {
+            // 声明retMap集合
+            Map retMap = new LinkedHashMap();
+            // 声明resultIdRetList集合
+            List<Integer> resultIdRetList = new ArrayList<>();
+            // 设置参数
+            HashMap paramsMap = new HashMap<>();
+            paramsMap.put("cutoffId", cutoffId);
+            paramsMap.put("startTime", startTime);
+            paramsMap.put("endTime", endTime);
+            paramsMap.put("resultId", resultId);
+            paramsMap.put("orderFetch", "order by resultId asc");
+            // 根据参数查询ResultId集合
+            List<HashMap> resultIdList = processMapper.queryCutoffResultMap(paramsMap);
+            // 判断时间段内是否存在resultId
+            if (resultIdList.size() == 0) {
+                // 处理startTimeValue、endTimeValue、resultIdRetList到retMap集合
+                retMap.put("startTime", startTime);
+                retMap.put("endTime", endTime);
+                retMap.put("size", resultIdRetList.size());
+                retMap.put("interval", "1min");
+                retMap.put("resultIds", resultIdRetList);
+                // 返回
+                return JSON.toJSONString(retMap);
+            }
+            // 获取开始时间
+            Object startTimeValue = resultIdList.get(0).get("FORMATCLOCK");
+            // 获取结束时间
+            Object endTimeValue = resultIdList.get(resultIdList.size() - 1).get("FORMATCLOCK");
+            // 处理startTimeValue、endTimeValue、resultIdRetList到retMap集合
+            retMap.put("startTime", startTimeValue);
+            retMap.put("endTime", endTimeValue);
+            retMap.put("size", resultIdRetList.size());
+            retMap.put("interval", "1min");
+            retMap.put("resultIds", resultIdList);
+            // 返回
+            return JSON.toJSONString(retMap);
+        } catch (Exception e) {
+            // 返回错误码
+            return "500";
+        }
+    }
     /**
      * 查询出铁数据项
      *
@@ -763,7 +946,166 @@ public class GlController {
             return "500";
         }
     }
+    /**
+     * 查询(热电偶)等温线数据项将历史回放数据存入数据库库中
+     *
+     * @param resultId
+     * @remark1：传参resultId：进行历史回放查询功能
+     * @remark2：传参resultId：查询resultId对应的(热电偶)等温线数据项
+     * @remark3：不传参resultId：查询最新的(热电偶)等温线数据项
+     */
+    @CrossOrigin
+    @PostMapping("/queryThermocoupleAndUpdate")
+    public String queryThermocoupleAndUpdate(String resultId) {
+        try {
+            //根据2级数据库更新本地历史回放数据数据库
+//            processService.differenceresultid();
+            differenceresultid("","","");
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            //查询数据库中所有的ResultId(用来查询等值图的id)
+//            String resultid=queryResultIdbyTimes("1","","");
+//            List<Integer> resultidValue = objectMapper.convertValue(
+//                    objectMapper.readTree(resultid).get("resultIds"),
+//                    new TypeReference<List<Integer>>() {}
+//            );
+//            //查询本地历史回放数据数据库
+//            String localresultid=queryResultIdbyLocal("1","","");
+//            List<Integer> localresultidValue = objectMapper.convertValue(
+//                    objectMapper.readTree(localresultid).get("resultIds"),
+//                    new TypeReference<List<Integer>>() {}
+//            );
+//            //将list转为HashSet使用时间复杂度更低的对比值
+//            HashSet<Integer> set = new HashSet<>(localresultidValue);
+//            List<Integer> difference = new ArrayList<>();
+//            for (Integer num : resultidValue) {
+//                if (!set.contains(num)) {
+//                    difference.add(num);
+//                    //将本地数据库中没有的数据插入
+//                    processService.JsonFileService(queryThermocouple(num.toString()),num);
+//                }
+//            }
+            // 获取(热电偶)等温线对应的excel数据项
+            List<BlastFurnaceMode> BlastFurnaceList = processService.readBlastFurnaceExcel("热电偶数据项.xlsx");
+            // BlastFurnaceList根据table字段分组
+//			Stream API   集合中的对象按照某个属性进行分组 Collectors.groupingBy 方法是一个收集器（Collector），它将流中的元素根据指定的分类函数进行分组
+//			collect() 方法接收一个 java.util.stream.Collector 对象，该对象定义了如何进行收集操作
+//			可以将 Stream 中的元素收集（Collect）起来，生成一个新的数据结构
+            Map<String, List<BlastFurnaceMode>> BlastFurnaceModeMap = BlastFurnaceList.stream().collect(Collectors.groupingBy(BlastFurnaceMode::getTable));
+            // 设置参数
+            HashMap paramsMap = new HashMap<>();
+            paramsMap.put("rows", 1);
+            paramsMap.put("isotherm", "isotherm");
+            paramsMap.put("resultId", resultId);
+            // 声明tableNamesList集合
+            List<String> tableNamesList = new ArrayList<String>();
+            // 添加数据项到tableNamesList集合
+            tableNamesList.add("T_CUTOFF_RESULT_AVG_1");
+            tableNamesList.add("T_CUTOFF_RESULT_AVG_2");
+            tableNamesList.add("T_CUTOFF_RESULT_AVG_3");
+//			tableNamesList.add("T_CUTOFF_RESULT_AVG_9");
+//			tableNamesList.add("T_CUTOFF_RESULT_AVG_10");
+            // 声明ThermocoupleMap集合
+            HashMap ThermocoupleMap = new HashMap<>();
+            // 遍历tableNamesList集合
+            for (int i = 0; i < tableNamesList.size(); i++) {
+                // 获取表名
+                String tableName = tableNamesList.get(i);
+                // 处理表名到paramsMap集合
+                paramsMap.put("tableName", tableName);
+                // 获取查询字段
+                processService.getFieldStr(BlastFurnaceModeMap.get(tableName), paramsMap, "field");
+                // 查询(热电偶)等温线数据项
+                HashMap ThermocoupleValueMap = glService.queryThermocouple(paramsMap).get(0);
+                // 处理热电偶数据项到ThermocoupleMap集合
+                ThermocoupleMap.putAll(ThermocoupleValueMap);
+            }
+            // 根据：数据库数据项、excel数据项，处理(热电偶)等温线数据格式
+            List<HashMap> FormatBlastFurnaceList = processService.formatBlastFurnaceData(ThermocoupleMap, BlastFurnaceList, resultId);
+//			// 根据time：查询T_CUTOFF_RESULT表时间
+//			Long timeStamp = processService.queryResultTimeStamp(1, resultId,"resultId");
+//			HashMap timesParamsMap = new HashMap<>();
+//			// 处理timeStamp到ThermalLoadRetMap集合
+//			timesParamsMap.put("timeStamp", timeStamp);
+//			FormatBlastFurnaceList.add(timesParamsMap);
+            // 返回
+            return JSON.toJSONString(FormatBlastFurnaceList);
+        } catch (Exception e) {
+            // 返回错误码
+            return "500";
+        }
+    }
+    /**
+     * 查询(热电偶)等温线数据项从历史回放数据数据库库中
+     *
+     * @param resultId
+     * @remark1：传参resultId：进行历史回放查询功能
+     * @remark2：传参resultId：查询resultId对应的(热电偶)等温线数据项
+     * @remark3：不传参resultId：查询最新的(热电偶)等温线数据项
+     */
+    @CrossOrigin
+    @PostMapping("/queryThermocoupleFromLocal")
+    public String queryThermocoupleFromLocal(String resultId) {
+        try {
+            //从本地数据库中查询历史数据并返回
+            return  processService.JsonReader("",Integer.parseInt(resultId));
+        } catch (Exception e) {
+            // 返回错误码
+            return "500";
+        }
+    }
+    /**
+     * 将历史回放数据存入数据库库中
+     */
+    @CrossOrigin
+    @PostMapping("/differenceresultid")
+    public void differenceresultid(String resultId,String startTime, String endTime) throws Exception{
+        ObjectMapper objectMapper = new ObjectMapper();
+        //查询数据库中所有的ResultId(用来查询等值图的id)
+//        String resultidJson=queryResultIdbyTimes("1",startTime,endTime);
+//        使用 TypeReference 和 Jackson 库提供的 ObjectMapper 的 convertValue() 方法来将 JSON 字符串中的列表值转换为 Java 列表。
+//        使用 readTree() 方法将 JSON 字符串转换为 JsonNode 对象。然后，我们从 JsonNode 对象中获取名为 "key2" 的列表节点
+//        使用 objectMapper.convertValue() 方法将列表节点（）转换为 Java 列表。我们使用 new TypeReference<List<String>>() {} 来指定目标类型为 List<String>
+//        List<Integer> resultidValue = objectMapper.convertValue(
+//                objectMapper.readTree(resultidJson).get("resultIds"),
+//                new TypeReference<List<Integer>>() {}
+//        );
+        List<Integer> resultidValue=queryResultIdbyTimesOnThread(jdbcTemplate1,"0");
+        //查询本地历史回放数据数据库
+//        String localresultidJson=queryResultIdbyLocal("1","","");
+//        HashMap insertIDParam =new HashMap();
+        //不一次次的查sql，一次性找出所有的id，循环去插入
+//        Map<String,List<HashMap>> insertIDParam = objectMapper.readValue(queryResultMap("1","",""), Map.class);
+//        List<Integer> localresultidValue = objectMapper.convertValue(
+//                objectMapper.readTree(localresultidJson).get("resultIds"),
+//                new TypeReference<List<Integer>>() {}
+//        );
+        List<Integer> localresultidValue=queryResultIdbyTimesOnThread(jdbcTemplate2,"1");
+        //将list转为HashSet使用时间复杂度更低的对比值
+        HashSet<Integer> set = new HashSet<>(localresultidValue);
+        List<Integer> difference = new ArrayList<>();
+        List<HashMap<String, Object>> differencelist = new ArrayList<>();
+        HashMap<String, Object> result = null;
+        //本地数据库没有的id对应的数据添加到本地数据库
+        for (Integer num : resultidValue) {
+            if (!set.contains(num)) {
+                difference.add(num);
+                //不一次次的查sql，一次性找出所有的id，循环去插入
+//                for (HashMap<String, Object> map : insertIDParam.get("resultIds")) {
+//                    if (map.containsKey("RESULTID") && map.get("RESULTID").equals(num)) {
+//                        result = map;
+//                        break;
+//                    }
+//                }
+                HashMap<Object,Object> resultMap = objectMapper.readValue(queryResultMap("1","","",num), new TypeReference<HashMap<Object,Object>>() {});
+                differencelist=objectMapper.readValue(JSON.toJSONString(resultMap.get("resultIds")), new TypeReference<List<HashMap<String, Object>>>(){});
+              HashMap s=differencelist.get(0);
+                htMapper.insertID(s);
+                //将本地数据库中没有的数据插入
+//                processService.JsonFileService(queryThermocouple(num.toString()),num);
 
+            }
+        }
+    }
     /**
      * 查询(热电偶)等温线历史趋势图数据项
      *
@@ -950,9 +1292,9 @@ public class GlController {
             // 获取HeatMapResultIdList集合
             List<Integer> HeatMapResultIdList = (List<Integer>) HeatMapResultIdHashMap.get("HeatMapResultId");
             // 获取HeatMapResultIdStr、HeatMapResultIdBeforeStr字符串 当前的一小时和一天前的一小时的数据(默认按照1分钟一条)
-            //下面对当前的一小时和一天前的一小时的数据都取平均然后取差值
-            String HeatMapResultIdStr = HeatMapResultIdList.subList(0, 60).toString().replace("[", "(").replace("]", ")");
-            String HeatMapResultIdBeforeStr = HeatMapResultIdList.subList(1440, 1500).toString().replace("[", "(").replace("]", ")");
+            //下面对当前的一小时和一天前的一小时的数据都取平均然后取差值修改为10分钟平均
+            String HeatMapResultIdStr = HeatMapResultIdList.subList(0, 10).toString().replace("[", "(").replace("]", ")");
+            String HeatMapResultIdBeforeStr = HeatMapResultIdList.subList(1490, 1500).toString().replace("[", "(").replace("]", ")");
             // 声明tableNamesList集合
             List<String> tableNamesList = new ArrayList<String>();
             // 添加数据项到tableNamesList集合
@@ -1039,7 +1381,7 @@ public class GlController {
             paramsMap.put("rows", rows);
             paramsMap.put("time", time);
             paramsMap.put("heatMap", "heatMap");
-            // 获取热力图对应的resultId集合字符串
+            // 获取热力图对应的resultId集合字符串（按照一分钟一条数据查询一天的数据）
             HashMap<String, Object> HeatMapResultIdHashMap = processService.getHeatMapResultId(paramsMap);
             String HeatMapResultIdStr = HeatMapResultIdHashMap.get("HeatMapResultIdStr").toString();
             // 设置参数
@@ -1108,8 +1450,8 @@ public class GlController {
             List<HashMap> PressureList_4 = glService.queryHotPressure(paramsMap);
             HashMap PressureMap_4 = PressureList_4.get(0);
             // 查询炉顶压力数据项：T_CUTOFF_RESULT_AVG_1
-			List<HashMap> PressureList_5 = glService.queryTopPressure(paramsMap);
-			HashMap PressureMap_5 = PressureList_5.get(0);
+            List<HashMap> PressureList_5 = glService.queryTopPressure(paramsMap);
+            HashMap PressureMap_5 = PressureList_5.get(0);
             // 声明PressureMap集合
             HashMap PressureMap = new HashMap<>();
             // 处理压力数据项到PressureMap集合
@@ -1117,7 +1459,7 @@ public class GlController {
 //			PressureMap.putAll(PressureMap_2);
 //            PressureMap.putAll(PressureMap_3);
             PressureMap.putAll(PressureMap_4);
-			PressureMap.putAll(PressureMap_5);
+            PressureMap.putAll(PressureMap_5);
             // 获取压力对应的excel数据项
             List<BlastFurnaceMode> BlastFurnaceList = processService.readBlastFurnaceExcel("炉身静压数据项.xlsx");
             // 根据：数据库数据项、excel数据项，处理压力数据格式
@@ -1816,5 +2158,91 @@ public class GlController {
         Double a = 0.622799;
         Double b = 4.22;
         System.out.print(Double.parseDouble(ThermocoupleRetMap.get("b").toString()) < Double.parseDouble(ThermocoupleRetMap.get("c").toString()));
+    }
+
+    @CrossOrigin
+    @GetMapping("/execl1")
+    public void generateExcelAndReturn(HttpServletResponse response) throws IOException {
+        // 创建工作簿
+        Workbook workbook = new XSSFWorkbook();
+        // 创建工作表
+        Sheet sheet = workbook.createSheet("Data Sheet");
+
+        // 创建表头行
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Column 1");
+        headerRow.createCell(1).setCellValue("Column 2");
+        // ...
+
+        // 填充数据
+        int rowNum = 1;
+
+        Row row = sheet.createRow(1);
+        row.createCell(0).setCellValue(1);
+        row.createCell(1).setCellValue(2);
+        // ...
+
+
+        // 设置响应内容的类型为Excel文件
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        // 设置响应头，指定文件名
+        response.setHeader("Content-disposition", "attachment; filename=data.xlsx");
+//        response.setHeader("Access-Control-Allow-Origin","*");
+//        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        // 将Excel文件写入响应的输出流    FileOutputStream将Workbook对象写入到响应的输出流 中
+        workbook.write(response.getOutputStream());
+        workbook.close();
+//        由于在调用 workbook.write(response.getOutputStream()) 之后已经向响应提交了数据，因此无法再修改响应的状态或头信息。
+//        解决这个问题的方法是不要同时返回 ServletOutputStream 对象和调用 workbook.write(response.getOutputStream())
+//        return response.getOutputStream();
+//        // 将Excel文件保存到服务器临时目录
+//        String filePath = "/path/to/temp/excel.xlsx";
+        //将文件转换为流
+//        FileOutputStream outputStream = new FileOutputStream(filePath);
+        //将workbook对象写到filePath的文件里
+//        workbook.write(outputStream);
+//        outputStream.close();
+//
+//        // 将Excel文件写入响应的输出流
+//        FileInputStream fileInputStream = new FileInputStream(filePath);
+//        ServletOutputStream outputStream = response.getOutputStream();
+//        byte[] buffer = new byte[4096];
+//        int bytesRead;
+        ////read(byte[] bytes)：读取字节数组的数据，并返回实际读取的字节数。
+//        while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+//        //write(byte[] bytes, int offset, int length)：从指定的偏移量开始，写入指定长度的字节数组数据。
+//            outputStream.write(buffer, 0, bytesRead);
+//        }
+//        fileInputStream.close();
+//        outputStream.close();
+//
+//        // 删除临时文件
+//        File tempFile = new File(filePath);
+//        tempFile.delete();
+
+    }
+   /** 通过使用反射，您可以获取到Object对象中的所有字段和对应的值。
+    * 然后，将字段名作为键，字段值作为值，将它们逐个放入HashMap中。
+    * **/
+    @CrossOrigin
+    @GetMapping("/objectZhashmap")
+    public HashMap objectZhashmap( Object obj) throws IOException {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        Class<?> objClass = obj.getClass();
+        Field[] fields = objClass.getDeclaredFields();
+
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                String fieldName = field.getName();
+                Object fieldValue = field.get(obj);
+
+                hashMap.put(fieldName, fieldValue);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return hashMap;
     }
 }

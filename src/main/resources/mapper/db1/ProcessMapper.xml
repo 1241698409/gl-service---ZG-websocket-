@@ -6,30 +6,53 @@
 	 <!-- 查询T_CUTOFF_RESULT表数据项 -->
      <select id="queryCutoffResult" resultType="map">
 	     SELECT 
-		     RESULTID,
-		     CUTOFFID,
-		     CLOCK,
-		     TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK
-	     FROM 
-	     	IPLATURE.T_CUTOFF_RESULT 
-	     WHERE 
-	     	1 = 1
-     	 <if test="cutoffId != null and cutoffId != ''">
-		 	AND CUTOFFID = ${cutoffId}
-	     </if>
-	     <if test="resultId != null and resultId != ''">
-	      	AND RESULTID = ${resultId}
-	     </if>
-	     <if test="startTime != null and startTime != ''">
-	      	AND clock > #{startTime}
-	     </if>
-	     <if test="endTime != null and endTime != ''">
-	      	AND clock <![CDATA[<]]> #{endTime}
-	     </if>
-	     ${orderFetch}
-     </select>
-     
-     <!-- 根据resultId对应的时间区间，查询T_TS_TAP表 -->
+		     RESULTID
+		 <!--  CUTOFFID,
+           CLOCK
+  TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK-->
+FROM
+    IPLATURE.T_CUTOFF_RESULT
+WHERE
+    1 = 1
+ <if test="cutoffId != null and cutoffId != ''">
+    AND CUTOFFID = ${cutoffId}
+</if>
+<if test="resultId != null and resultId != ''">
+     AND RESULTID = ${resultId}
+</if>
+<if test="startTime != null and startTime != ''">
+     AND clock > #{startTime}
+</if>
+<if test="endTime != null and endTime != ''">
+     AND clock <![CDATA[<]]> #{endTime}
+</if>
+${orderFetch}
+</select>
+	<select id="queryCutoffResultMap" resultType="map">
+		SELECT
+		RESULTID,
+		CUTOFFID,
+		CLOCK,
+		TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK
+		FROM
+		IPLATURE.T_CUTOFF_RESULT
+		WHERE
+		1 = 1
+		<if test="cutoffId != null and cutoffId != ''">
+			AND CUTOFFID = ${cutoffId}
+		</if>
+		<if test="resultId != null and resultId != ''">
+			AND RESULTID = ${resultId}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND clock > #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND clock <![CDATA[<]]> #{endTime}
+		</if>
+		${orderFetch}
+	</select>
+<!-- 根据resultId对应的时间区间，查询T_TS_TAP表 -->
 	 <select id="queryTapNoByTimes" resultType="map">
 		SELECT 
 			TAPNO,

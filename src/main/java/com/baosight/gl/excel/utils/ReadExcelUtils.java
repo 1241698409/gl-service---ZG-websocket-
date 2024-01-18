@@ -32,11 +32,12 @@ public class ReadExcelUtils {
 				if (rowData instanceof Object) {
 					// 判断是否为空行
 					if (!isAllFieldsNull(rowData)) {
-						// 将非空行加入到 modeList 中
+						// 将非空行加入到 list 中
 					list.add(rowData);
 					}
 				}
 			}
+//			将集合（Collection）转换为指定类型的列表（List）
 			modeList = CollectionUtils.toList(list, desiredClass);
 //			modeList = CollectionUtils.toList(sheetList, desiredClass);
 		} catch (Exception e) {

@@ -113,5 +113,9 @@ public interface ProcessService {
 
 	public String getHeatMapResultIdHistory(HashMap heatMapParamsMap) throws Exception;
 	public String JsonFileService (String stringJson) throws Exception;
+	public String JsonFileService (String stringJson,Integer resultid) throws Exception;
 	public String JsonReader  (String time) throws Exception;
+	public String JsonReader  (String time,Integer resultid) throws Exception;
+
+	void differenceresultid() throws Exception;
 }
