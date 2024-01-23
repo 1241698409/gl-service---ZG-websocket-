@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.baosight.gl.mapper.db3.LGMapper">
+
+	 <!-- 查询T_CUTOFF_RESULT表数据项 -->
+     <select id="queryCutoffResult" resultType="map">
+	     SELECT 
+		     RESULTID,
+	         CUTOFFID,
+           CLOCK,
+  TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK
+FROM
+    IPLATURE.T_CUTOFF_RESULT
+WHERE
+    1 = 1
+ <if test="cutoffId != null and cutoffId != ''">
+    AND CUTOFFID = ${cutoffId}
+</if>
+<if test="resultId != null and resultId != ''">
+     AND RESULTID = ${resultId}
+</if>
+<if test="startTime != null and startTime != ''">
+     AND clock > #{startTime}
+</if>
+<if test="endTime != null and endTime != ''">
+     AND clock <![CDATA[<]]> #{endTime}
+</if>
+${orderFetch}
+</select>
+	<select id="queryCutoffResultMap" resultType="map">
+		SELECT
+		RESULTID,
+		CUTOFFID,
+		CLOCK,
+		TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK
+		FROM
+		IPLATURE.T_CUTOFF_RESULT
+		WHERE
+		1 = 1
+		<if test="cutoffId != null and cutoffId != ''">
+			AND CUTOFFID = ${cutoffId}
+		</if>
+		<if test="resultId != null and resultId != ''">
+			AND RESULTID = ${resultId}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND clock > #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND clock <![CDATA[<]]> #{endTime}
+		</if>
+		${orderFetch}
+	</select>
+<!-- 根据resultId对应的时间区间，查询T_TS_TAP表 -->
+	 <select id="queryTapNoByTimes" resultType="map">
+		SELECT 
+			TAPNO,
+			STARTTIME,
+			ENDTIME 
+		FROM 
+			IPLATURE.T_TS_TAP 
+		WHERE 
+			ENDTIME is not null 
+		AND ENDTIME > (
+			select CLOCK - ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+		AND ENDTIME <![CDATA[<=]]> (
+			select CLOCK + ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+	 </select>
+	 
+	 <!-- 根据resultId对应的时间区间，查询CUTOFFID=3的T_CUTOFF_RESULT表 -->
+	 <select id="queryCutOff3ResultIdByTimes" resultType="map">
+		SELECT 
+			RESULTID,
+			CUTOFFID,
+			CLOCK
+		FROM 
+			IPLATURE.T_CUTOFF_RESULT 
+		WHERE 
+			CUTOFFID = 3
+		AND CLOCK > (
+			select CLOCK - ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+		AND CLOCK <![CDATA[<=]]> (
+			select CLOCK + ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId} 
+		)
+	 </select>
+	 
+	 <!-- 根据resultId对应的时间区间，查询T_MD_BODY_MAT_LAYER表 -->
+	 <select id="queryLayerClockByTimes" resultType="map">
+		SELECT clock FROM BENGANG.T_MD_BODY_MAT_LAYER
+	   	where clock > (
+			select CLOCK - ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+		AND clock <![CDATA[<]]> (
+			select CLOCK + ${number} hour from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+	   	group by clock 
+	 </select>
+	 
+	  <!-- 根据resultId对应的时间区间，查询T_MD_ER_VALUE_GROUP表 -->
+	  <select id="queryErodeSolidByTimes" resultType="map">
+		SELECT STARTDATE FROM IPLATURE.T_MD_ER_VALUE_GROUP
+	   	where STARTDATE > (
+			select CLOCK - ${number} day from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+		AND STARTDATE <![CDATA[<]]> (
+			select CLOCK + ${number} day from IPLATURE.T_CUTOFF_RESULT 
+			where CUTOFFID = #{cutoffId} and resultid = #{resultId}
+		)
+	  </select>
+	 <select id="queryHeatMapResultId" resultType="int">
+	   	SELECT RESULTID FROM IPLATURE.T_CUTOFF_RESULT WHERE CUTOFFID = 1 
+	  	 AND clock in
+	  	  (
+	         (
+		       select clock as clock from IPLATURE.T_CUTOFF_RESULT where CUTOFFID = 1
+		          <if test="resultId != null and resultId != ''">
+			   		  AND RESULTID = #{resultId}
+			   	  </if> 
+			   	  <if test="time != null and time != ''">
+    				  AND CLOCK <![CDATA[<]]> #{time}
+    		  	  </if> 
+		              order by resultId desc fetch first ${rows} rows only
+	         )
+             union all
+	     	 (
+		       select (CLOCK - ${number} hour) as clock from IPLATURE.T_CUTOFF_RESULT where CUTOFFID = 1
+		          <if test="resultId != null and resultId != ''">
+			   		  AND RESULTID = #{resultId}
+			   	  </if> 
+			   	  <if test="time != null and time != ''">
+    				  AND CLOCK <![CDATA[<]]> #{time}
+    		  	  </if> 
+		              order by resultId desc fetch first ${rows} rows only
+	         )
+           )
+	 </select>
+	<select id="queryMaterialLayer" resultType="map">
+		SELECT
+		layer.CHARGENO,
+		layer.BASEH,
+		layer.LEVEL,
+		layer.THICK,
+		layer.POINTX
+		FROM
+		BENGANG.T_MD_BODY_MAT_LAYER layer
+		WHERE 1=1
+		<if test="clock != null and clock != ''">
+			and layer.CLOCK = #{clock}
+		</if>
+		<if test="clock == null or clock == ''">
+			and layer.CLOCK = (SELECT MAX(CLOCK) FROM BENGANG.T_MD_BODY_MAT_LAYER)
+		</if>
+		ORDER BY LEVEL ASC
+	</select>
+	<!-- 料层数据项_1 -->
+	<select id="queryMaterialLayerData" resultType="map">
+		SELECT
+			LAYER.CHARGENO         AS "chargeNo",
+			LAYER.LEVEL            AS "level",
+			LAYER.THICK            AS "thick",
+			LAYER.C_THICK          AS "cThick",
+			LAYER.O_THICK          AS "oThick",
+			LAYER.FLAG             AS "flag",
+			INFO.CHARGENO          AS "chargeNo",
+			INFO.THEO_FE           AS "theoFe",
+			INFO.THEO_SLAG         AS "theoSlag",
+			INFO.COKE_RATIO        AS "cokeRatio",
+			INFO.COMPRE_COKE_RATIO AS "compreCokeRatio",
+			INFO.R                 AS "r",
+			INFO.COKE_TOTAL        AS "cokeTotal",
+			INFO.CHARGE_WGT        AS "chargeWgt"
+		FROM
+			MD.T_MD_BODY_MAT_LAYER LAYER
+				LEFT JOIN
+			MD.T_MD_BODY_CHARGE_CAL_INFO INFO
+			ON
+				LAYER.CHARGENO = INFO.CHARGENO
+		WHERE
+			LAYER.CLOCK = (SELECT MAX(CLOCK) FROM MD.T_MD_BODY_MAT_LAYER)
+		ORDER BY LEVEL ASC
+	</select>
+
+	<!-- 查询侵蚀线、凝固线：角度数据项截取:之后的角度 -->
+	<select id="queryErodeSolidAngle" resultType="map">
+		SELECT
+			ANGLEID,
+			SUBSTR(DESCR , LOCATE(':',DESCR)+1 , LENGTH(DESCR)) AS ANGLE,
+			DESCR
+		FROM
+			IPLATURE.T_MD_ER_ANGLE
+		WHERE
+			ANGLEID NOT IN (101,102,103,1001)
+
+	</select>
+	<!--	&lt;!&ndash; 查询侵蚀线、凝固线：角度数据项 &ndash;&gt;-->
+	<!--	<select id="queryErodeSolidAngle" resultType="map">-->
+	<!--		SELECT-->
+	<!--			ANGLEID,-->
+	<!--			SUBSTR(DESCR,12,LENGTH(DESCR)-13) as ANGLE,-->
+	<!--			DESCR-->
+	<!--		FROM-->
+	<!--			IPLATURE.T_MD_ER_ANGLE-->
+	<!--		&#45;&#45;       WHERE-->
+	<!--&#45;&#45;       	ANGLEID in (1,2,3,4,5,6,7,8)-->
+	<!--	</select>-->
+	<!-- 查询侵蚀线、凝固线：CalcId数据项 -->
+	<select id="queryErodeSolidCalcId" resultType="map">
+		SELECT VC.CALCID as "calcId" FROM IPLATURE.T_MD_ER_VALUE_CALC VC WHERE 1 = 1
+		<if test="startTime != null and startTime != ''">
+			AND VC.STARTDATE = #{startTime}
+		</if>
+		<if test="startTime == null or startTime == ''">
+			AND VC.STARTDATE = (select max(STARTDATE) from IPLATURE.T_MD_ER_VALUE_CALC)
+			<!--	AND VC.STARTDATE = (SELECT TIMESTAMP(MAX(STARTDATE))-1 DAY FROM IPLATURE.T_MD_ER_VALUE_CALC)-->
+		</if>
+		AND VC.ANGLEID = (SELECT ANGLEID from IPLATURE.T_MD_ER_ANGLE WHERE DESCR = #{angleValue})
+		order by CALCID desc fetch first 1 rows only
+	</select>
+
+	<!-- 查询侵蚀线数据项，注：r-半径、z-高度、angle-角度-->
+	<select id="queryErodeDataItem" resultType="map">
+		SELECT
+			TVP.R,
+			TVP.Z
+		FROM
+			IPLATURE.T_MD_ER_VALUE_POLYGON_POINT TPP
+				LEFT JOIN
+			IPLATURE.T_MD_ER_VALUE_POINT TVP
+			ON
+				TPP.POINTID =tvp.POINTID
+		WHERE
+				TPP.POLYGONID =
+				(
+					SELECT TVP.polygonid from IPLATURE.t_md_er_value_polygon tvp
+					where tvp.calcid = #{calcId}
+					  and tvp.polygontype = (select t.polygontype from IPLATURE.t_md_er_polygon_type t where t.polygonkey='ER_POLYGON_MW')
+				)
+		ORDER BY tpp.POLYGONID, tpp.SEQ
+	</select>
+
+	<!-- 查询凝固线数据项，注：r-半径、z-高度、angle-角度-->
+	<select id="querySolidDataItem" resultType="map">
+		SELECT
+			tvp.R,
+			tvp.Z
+		FROM
+			IPLATURE.T_MD_ER_VALUE_POLYGON_POINT tpp
+				LEFT JOIN
+			IPLATURE.T_MD_ER_VALUE_POINT tvp
+			ON
+				tpp.POINTID =tvp.POINTID
+		WHERE
+				tpp.POLYGONID =
+				(
+					select
+						tvp.polygonid from IPLATURE.t_md_er_value_polygon tvp
+					where tvp.calcid = #{calcId}
+					  and tvp.polygontype = (select t.polygontype from IPLATURE.t_md_er_polygon_type t where t.polygonkey='ER_POLYGON_W')
+				)
+		ORDER BY tpp.POLYGONID, tpp.SEQ
+	</select>
+
+	<!-- 查询标高数据项 -->
+	<select id="queryElevation" resultType="map">
+		select
+			'标高' || high as dispname,
+			high
+		from
+			(select cast(tt.z as decimal(5,3)) as high
+			 from
+				 (select distinct t1.z from IPLATURE.t_md_er_point t1 where t1.pointtype = 6) tt where tt.z <![CDATA[<=]]>
+																									   (select t.defval from IPLATURE.t_md_er_calc_parameter_setup t where t.keyname = 'PAR_ER_COOLWALL_Y_MAX')
+																								   and
+					 tt.z >=(select t.defval from IPLATURE.t_md_er_calc_parameter_setup t where t.keyname = 'PAR_ER_COOLWALL_Y_MIN')) t4
+		order by high desc
+	</select>
+
+	<!-- 查询模型：其余角度侵蚀线/凝固线数据项-->
+	<select id="queryOtherAnglesLine" resultType="map">
+		SELECT
+		<!-- t.POINTID,
+        t.ITEMID,
+        t.GROUPID,
+        t1.POINTTYPE,
+        t2.STARTDATE, -->
+		t1.Z AS "height" ,
+		<!-- 当前半径-残厚半径-->
+		t1.r + 0.1 - t.val AS "radius",
+		ROUND (
+		(
+		SELECT DISTINCT
+		angle
+		FROM
+		IPLATURE.t_md_er_couple a,
+		IPLATURE.t_md_er_couple_point b
+		WHERE
+		a.coupleid = b.coupleid
+		AND b.pointid = t1.pointid
+		), 0
+		) as "angle"
+		FROM
+		IPLATURE.t_md_er_value_wall_point t,
+		IPLATURE.t_md_er_point t1,
+		IPLATURE.t_md_er_value_group t2
+		WHERE
+		t.POINTID = t1.POINTID
+		<!-- AND t1.Z = #{high} -->
+		AND t.ITEMID = #{itemId}
+		AND t1.POINTTYPE = 6
+		AND t.GROUPID = t2.GROUPID
+		<if test="startTime != null and startTime != ''">
+			AND t2.STARTDATE = #{startTime}
+		</if>
+		<if test="startTime == null or startTime == ''">
+			<!-- AND t2.STARTDATE = (select max(STARTDATE) from IPLATURE.T_MD_ER_VALUE_GROUP) -->
+			AND t2.STARTDATE = (SELECT TIMESTAMP(MAX(STARTDATE))-1 DAY FROM IPLATURE.T_MD_ER_VALUE_GROUP)
+		</if>
+	</select>
+
+	<!-- 查询模型：残厚数据，注：r-半径、z-高度、angle-角度-->
+	<select id="queryResidualThickness" resultType="map">
+		SELECT
+		t.POINTID,
+		t.ITEMID,
+		t.GROUPID,
+		t1.POINTTYPE,
+		t2.STARTDATE,
+		t1.Z AS "height" ,
+		t.val AS "radius",
+		ROUND (
+		(
+		SELECT DISTINCT
+		angle
+		FROM
+		IPLATURE.t_md_er_couple a,
+		IPLATURE.t_md_er_couple_point b
+		WHERE
+		a.coupleid = b.coupleid
+		AND b.pointid = t1.pointid
+		), 0
+		) as "angle"
+		FROM
+		IPLATURE.t_md_er_value_wall_point t,
+		IPLATURE.t_md_er_point t1,
+		IPLATURE.t_md_er_value_group t2
+		WHERE
+		t.POINTID = t1.POINTID
+		AND t1.Z = #{high}
+		AND t.ITEMID = #{itemId}
+		AND t1.POINTTYPE = 6
+		AND t.GROUPID = t2.GROUPID
+		<if test="startTime != null and startTime != ''">
+			AND t2.STARTDATE = #{startTime}
+		</if>
+		<if test="startTime == null or startTime == ''">
+			AND t2.STARTDATE = (select max(STARTDATE) from IPLATURE.T_MD_ER_VALUE_GROUP)
+		</if>
+	</select>
+	<!-- 查询模型：残厚历史数据，注：r-半径、z-高度、angle-角度-->
+	<select id="queryResidualThicknessHis" resultType="map">
+		SELECT *
+		FROM (SELECT
+		t.POINTID,
+		t.ITEMID,
+		t.GROUPID,
+		t1.POINTTYPE,
+		t2.STARTDATE,
+		t1.Z AS "height" ,
+		t.val AS "radius",
+		ROUND (
+		(
+		SELECT DISTINCT
+		angle
+		FROM
+		IPLATURE.t_md_er_couple a,
+		IPLATURE.t_md_er_couple_point b
+		WHERE
+		a.coupleid = b.coupleid
+		AND b.pointid = t1.pointid
+		), 0
+		) as "angle"
+		FROM
+		IPLATURE.t_md_er_value_wall_point t,
+		IPLATURE.t_md_er_point t1,
+		IPLATURE.t_md_er_value_group t2
+		WHERE
+		t.POINTID = t1.POINTID
+		AND t1.Z = #{high}
+		AND t.ITEMID = #{itemId}
+		AND t1.POINTTYPE = 6
+		AND t.GROUPID = t2.GROUPID
+		<if test="startTime != null and startTime != ''"><!-- AND t2.STARTDATE <![CDATA[<=]]> TIMESTAMP(#{startTime}, 'YYYY-MM-DD-HH24:MI:SS.US')-->
+			AND t2.STARTDATE <![CDATA[<=]]>#{startTime}
+		</if>
+		<if test="startTime == null or startTime == ''">
+			AND t2.STARTDATE <![CDATA[<=]]> (select max(STARTDATE) from IPLATURE.T_MD_ER_VALUE_GROUP)
+		</if>
+		) subquery
+		WHERE (#{angle} IS NULL OR subquery."angle" = #{angle})
+		<if test="rows == null">
+			AND subquery.STARTDATE >= date((select max(STARTDATE) from IPLATURE.T_MD_ER_VALUE_GROUP) - 1 month)
+		</if>
+		ORDER BY subquery.STARTDATE DESC
+		<if test="rows != null">
+			FETCH FIRST ${rows} ROWS ONLY
+		</if>
+
+	</select>
+	<!-- 查询T_MD_WR_POINT_VALUE表数据项 -->
+	<select id="queryMdWrPointValue" resultType="map">
+		select
+			point.hight/1000 as "height",
+			point.angle as "angle",
+			value.width/100 as "radius"
+		from
+			IPLATURE.T_MD_WR_POINT_VALUE value,IPLATURE.T_MD_WR_POINT point
+		where
+			value.pointId = point.pointId
+		  and
+			value.width is not null
+		  and
+			value.clock =(select max(clock) from IPLATURE.T_MD_WR_POINT_VALUE)
+	</select>
+
+	<!-- 查询炉壳数据项 -->
+	<select id="queryMdErPolygon" resultType="map">
+		select
+		<!-- POINT.POINTID,
+        POINT.DESCR, -->
+		POINT.R,
+		POINT.Z
+		from
+		IPLATURE.T_MD_ER_POINT POINT
+		where
+		POINTID in
+		(
+		select
+		POINTID
+		from
+		IPLATURE.T_MD_ER_POLYGON POLYGON,
+		IPLATURE.T_MD_ER_POLYGONPOINT POLYGONPOINT
+		where
+		V_POLYGON = '11'
+		and
+		polygontype='1'
+		and
+		POLYGON.POLYGONID = POLYGONPOINT.POLYGONID
+		group by POINTID
+		)
+	</select>
+
+	<!-- 查询炉缸侵蚀耐火材数据项 -->
+	<select id="queryRefractoryMaterial" resultType="map">
+		SELECT
+			TP.POLYGONID,
+			TM.REMARK,
+			TPO.R,
+			TPO.Z
+		FROM
+			IPLATURE.T_MD_ER_POLYGON TP
+				LEFT JOIN
+			IPLATURE.T_MD_ER_MATERIAL TM
+			ON
+				TP.MATERIALID = TM.MATERIALID
+				LEFT JOIN
+			IPLATURE.T_MD_ER_POLYGONPOINT TPP
+			ON
+				TP.POLYGONID = TPP.POLYGONID
+				LEFT JOIN
+			(SELECT POINTID,R,Z FROM IPLATURE.T_MD_ER_POINT T WHERE V_POINT = (SELECT V_POINT FROM IPLATURE.T_MD_ER_ANGLE WHERE ANGLEID = #{angleId})) TPO
+			ON
+				TPP.POINTID = TPO.POINTID
+		WHERE
+			TP.POLYGONTYPE = 1
+		  AND TP.V_POLYGON = (SELECT V_POLYGON FROM IPLATURE.T_MD_ER_ANGLE WHERE ANGLEID = #{angleId})
+		  AND TP.USING IN (2,3)
+		ORDER BY TP.POLYGONID,TPP.SEQ
+	</select>
+
+</mapper>

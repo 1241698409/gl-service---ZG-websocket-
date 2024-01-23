@@ -6,10 +6,10 @@
 	 <!-- 查询T_CUTOFF_RESULT表数据项 -->
      <select id="queryCutoffResult" resultType="map">
 	     SELECT 
-		     RESULTID
-		 <!--  CUTOFFID,
-           CLOCK
-  TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK-->
+		     RESULTID,
+	         CUTOFFID,
+           CLOCK,
+  TO_CHAR(CLOCK,'YYYY-MM-DD HH24:MI:SS') as FORMATCLOCK
 FROM
     IPLATURE.T_CUTOFF_RESULT
 WHERE

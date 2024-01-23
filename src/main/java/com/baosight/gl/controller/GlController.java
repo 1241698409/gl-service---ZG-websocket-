@@ -129,7 +129,8 @@ public class GlController {
      */
     @CrossOrigin
     @PostMapping("/queryResultIdbyTimesOnThread")
-    public List<Integer> queryResultIdbyTimesOnThread(JdbcTemplate jdbcTemplate,String slag) {
+    public List<Integer> queryResultIdbyTimesOnThread(JdbcTemplate jdbcTemplate,String slag,Integer nextTimeID) throws IOException {
+        //需要完善，在初始查询的时候要把本地数据库的最新时间的时间作为开始时间（第一次查询结束后将此次查询的最新数据的时间作为下次的开始时间已完善）
         String sql = "SELECT RESULTID FROM IPLATURE.T_CUTOFF_RESULT WHERE 1 = 1 AND CUTOFFID = 1 AND CLOCK BETWEEN ? AND ?";
         LocalDateTime startDate = startTime==null?LocalDateTime.of(2024, 1, 1, 0, 0, 0):startTime; // 开始日期，这里以2020年1月1日为例
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -138,7 +139,7 @@ public class GlController {
 
         LocalDateTime currentMonth = startDate;
         List<Thread> threads = new ArrayList<>(); // 用于保存线程对象
-
+        ObjectMapper objectMapper = new ObjectMapper();
         while (currentMonth.isBefore(endDate)) {
             LocalDateTime nextMonth = currentMonth.plusMonths(1);
             Object[] params = new Object[]{currentMonth.format(formatter), nextMonth.format(formatter)};
@@ -157,9 +158,11 @@ public class GlController {
 
             currentMonth = nextMonth;
         }
-        if(slag=="1") {
+        if(slag=="1"&&nextTimeID>0) {
+            HashMap<Object,Object> nextTimeMap=objectMapper.readValue(queryResultMap("1","","",nextTimeID), new TypeReference<HashMap<Object,Object>>() {});
             //不能用最后一次查询的时间作为开始时间，应该是最后一条数据的时间作为开始时间（修改）
-            startTime = endDate;
+//            startTime = endDate;
+            startTime =   LocalDateTime.parse(nextTimeMap.get("endTime").toString(),formatter);
         }
         // 等待所有线程执行完毕
         for (Thread thread : threads) {
@@ -959,7 +962,7 @@ public class GlController {
     public String queryThermocoupleAndUpdate(String resultId) {
         try {
             //根据2级数据库更新本地历史回放数据数据库
-//            processService.differenceresultid();
+//            processService.differenceresultid(); 下面注释的是differenceresultid的部分代码
             differenceresultid("","","");
 //            ObjectMapper objectMapper = new ObjectMapper();
 //            //查询数据库中所有的ResultId(用来查询等值图的id)
@@ -1069,7 +1072,7 @@ public class GlController {
 //                objectMapper.readTree(resultidJson).get("resultIds"),
 //                new TypeReference<List<Integer>>() {}
 //        );
-        List<Integer> resultidValue=queryResultIdbyTimesOnThread(jdbcTemplate1,"0");
+        List<Integer> resultidValue=queryResultIdbyTimesOnThread(jdbcTemplate1,"0",-1);
         //查询本地历史回放数据数据库
 //        String localresultidJson=queryResultIdbyLocal("1","","");
 //        HashMap insertIDParam =new HashMap();
@@ -1079,7 +1082,7 @@ public class GlController {
 //                objectMapper.readTree(localresultidJson).get("resultIds"),
 //                new TypeReference<List<Integer>>() {}
 //        );
-        List<Integer> localresultidValue=queryResultIdbyTimesOnThread(jdbcTemplate2,"1");
+        List<Integer> localresultidValue=queryResultIdbyTimesOnThread(jdbcTemplate2,"1",resultidValue.get(resultidValue.size()-1));
         //将list转为HashSet使用时间复杂度更低的对比值
         HashSet<Integer> set = new HashSet<>(localresultidValue);
         List<Integer> difference = new ArrayList<>();
@@ -1101,7 +1104,7 @@ public class GlController {
               HashMap s=differencelist.get(0);
                 htMapper.insertID(s);
                 //将本地数据库中没有的数据插入
-//                processService.JsonFileService(queryThermocouple(num.toString()),num);
+                processService.JsonFileService(queryThermocouple(num.toString()),num,s);
 
             }
         }
@@ -1664,11 +1667,12 @@ public class GlController {
              */
             // 根据角度查询对应：高度和半径
             List<HashMap> ErosionLineList = glService.queryErodeDataItem(paramsMap);
-            // 处理ErosionLineList集合到ErosionLineValue 向上取整和残厚侵蚀数据角度一致
+            // 处理ErosionLineList集合到ErosionLineValue 向上取整和残厚侵蚀数据角度一致(不做残厚的话要和下面添加的角度list一致)
             ErosionLineValue.put(Math.ceil(putAngleValue), ErosionLineList);
             // 判断ErosionLineList长度
             if (ErosionLineList.size() != 0) {
-                emptyAngleList.add(putAngleValue);
+//                emptyAngleList.add(putAngleValue);
+                emptyAngleList.add(Math.ceil(putAngleValue));
             }
         }
         //根据本钢数据库新增代码
@@ -1842,7 +1846,8 @@ public class GlController {
             SolidificationLineValue.put(Math.ceil(putAngleValue), SolidificationLineList);
             // 判断SolidificationLineList长度
             if (SolidificationLineList.size() != 0) {
-                emptyAngleList.add(putAngleValue);
+//                emptyAngleList.add(putAngleValue);
+                emptyAngleList.add(Math.ceil(putAngleValue));
             }
         }
 //		//根据本钢数据库新增代码

@@ -5,12 +5,16 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baosight.gl.controller.GlController;
 import com.baosight.gl.mapper.db2.HtMapper;
+import com.baosight.gl.mapper.db3.LGMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,8 @@ public class ProcessServiceImpl implements ProcessService {
 	GlController GlController;
 	@Autowired
 	ProcessMapper processMapper;
+	@Autowired
+	LGMapper lgMapper;
 //	@Autowired
 	@Autowired(required = false)
 	HtMapper htMapper;
@@ -590,7 +596,7 @@ public class ProcessServiceImpl implements ProcessService {
 		// 转换时间数据项为时间戳
 		Long clock1 = FormatConstant.FORMAT1.parse(time).getTime();
 		// 查询erodeSolidList集合  取了前后各7天的侵蚀时间来判断距离现在时间最近的一个时间就是侵蚀数据的时间
-		List<HashMap> erodeSolidList = processMapper.queryErodeSolidByTimes(paramsMap);
+		List<HashMap> erodeSolidList = lgMapper.queryErodeSolidByTimes(paramsMap);
 		// 遍历erodeSolidList集合
 		for (int i = 0; i < erodeSolidList.size(); i++) {
 			// 获取erodeSolidMap集合
@@ -860,7 +866,7 @@ public class ProcessServiceImpl implements ProcessService {
 	}
 	@Override
 		public String JsonFileService(String stringJson,Integer resultid) throws Exception {
-		String fileName = "json_" + resultid+ ".json"; // 根据当前日期生成文件名
+		String fileName = "json_" + resultid+ ".json"; // 根据当前resultid生成文件名
 		Path filePath = Paths.get(jsonFilePath, fileName); // 拼接文件路径
 		FileWriter fileWriter = new FileWriter(filePath.toString());
 		fileWriter.write(stringJson);
@@ -868,6 +874,33 @@ public class ProcessServiceImpl implements ProcessService {
 		HashMap HashMapParam =new HashMap();
 		//注意时间和后台时间的格式对应问题，不对应会出现数据格式转换异常  这样写，sql不能加TIMESTAMP
 		HashMapParam.put("creatTime", LocalDate.now()+" 00:00:00");
+		HashMapParam.put("resultid", resultid);
+//		或者下面这么坐
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//		String createTimeStr = LocalDateTime.now().format(formatter);
+//		HashMapParam.put("creatTime", createTimeStr);
+//		HashMapParam.put("creatTime", LocalDate.now());
+		HashMapParam.put("filePath", filePath.toString());
+		htMapper.setFilePath(HashMapParam);
+		return "1";
+	}
+	@Override
+	public String JsonFileService(String stringJson,Integer resultid,HashMap resulthashMap) throws Exception {
+		String CLOCK=resulthashMap.get("CLOCK").toString();
+		//时间转换不熟悉
+		long timestampLong = Long.parseLong(CLOCK);
+		Timestamp timestamp = new Timestamp(timestampLong);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+		String formattedTimestamp = sdf.format(timestamp);
+		String fileName = "json_" + resultid+"-"+formattedTimestamp+".json"; // 根据当前resultid生成文件名
+		Path filePath = Paths.get(jsonFilePath, fileName); // 拼接文件路径
+		FileWriter fileWriter = new FileWriter(filePath.toString());
+		fileWriter.write(stringJson);
+		fileWriter.close();
+		HashMap HashMapParam =new HashMap();
+		//注意时间和后台时间的格式对应问题，不对应会出现数据格式转换异常  这样写，sql不能加TIMESTAMP
+		HashMapParam.put("creatTime", LocalDate.now()+" 00:00:00");
+		HashMapParam.put("CLOCK", timestamp);
 		HashMapParam.put("resultid", resultid);
 //		或者下面这么坐
 //		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

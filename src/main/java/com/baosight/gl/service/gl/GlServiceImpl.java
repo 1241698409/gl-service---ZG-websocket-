@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.baosight.gl.mapper.db3.LGMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,8 @@ public class GlServiceImpl implements GlService {
 
 	@Autowired
 	ProcessMapper processMapper;
-
+	@Autowired
+	LGMapper lgMapper;
 	@Override
 	public List<CastIronItemValue> queryCastIron(HashMap paramsMap) {
 		return glMapper.queryCastIron(paramsMap);
@@ -140,27 +142,27 @@ public class GlServiceImpl implements GlService {
 	
 	@Override
 	public List<HashMap> queryMaterialLayerData() {
-		return glMapper.queryMaterialLayerData();
+		return lgMapper.queryMaterialLayerData();
 	}
 
 	@Override
 	public List<HashMap> queryErodeSolidAngle() {
-		return glMapper.queryErodeSolidAngle();
+		return lgMapper.queryErodeSolidAngle();
 	}
 
 	@Override
 	public HashMap queryErodeSolidCalcId(HashMap paramsMap) {
-		return glMapper.queryErodeSolidCalcId(paramsMap);
+		return lgMapper.queryErodeSolidCalcId(paramsMap);
 	}
 
 	@Override
 	public List<HashMap> queryErodeDataItem(HashMap paramsMap) {
-		return glMapper.queryErodeDataItem(paramsMap);
+		return lgMapper.queryErodeDataItem(paramsMap);
 	}
 
 	@Override
 	public List<HashMap> querySolidDataItem(HashMap paramsMap) {
-		return glMapper.querySolidDataItem(paramsMap);
+		return lgMapper.querySolidDataItem(paramsMap);
 	}
 
 	@Override

@@ -100,14 +100,14 @@
 <!--	<insert id="setFilePath" useGeneratedKeys="true" KeyProperty="fileId">-->
 	<insert id="setFilePath" parameterType="java.util.HashMap">
 		insert into
-			IPLATURE.T_PLAYBACK
+			IPLATURE.T_PLAYBACK2
 		(
-			ID,CREATTIME, FILEPATH
+		RESULTID,CLOCK,CREATTIME, FILEPATH
 		)
 		values
 			(
 		<!--TIMESTAMP (#{creatTime},'YYYY-MM-DD HH24:MI:SS'),#{filePath}-->
-		#{resultid},#{creatTime},#{filePath}
+		#{resultid},#{CLOCK},#{creatTime},#{filePath}
     )
 </insert>
 	<insert id="insertID" parameterType="java.util.HashMap">
@@ -124,14 +124,14 @@
 <select id="JsonReader" resultType="map">
 	<!--SELECT TIMESTAMP('2023-12-01') AS timestamp_value FROM SYSIBM.SYSDUMMY1-->
 select
-    ID,
+	RESULTID,
     CREATTIME, FILEPATH
 from
-    IPLATURE.T_PLAYBACK
+    IPLATURE.T_PLAYBACK2
 where
 	<!--CREATTIME = TIMESTAMP (#{creatTime},'YYYY-MM-DD HH24:MI:SS')-->
 	<!--CREATTIME =#{creatTime}-->
-	ID=#{resultid}
+	RESULTID=#{resultid}
     </select>
 	<!-- 查询T_CUTOFF_RESULT表数据项 -->
 	<select id="queryCutoffResult" resultType="map">
