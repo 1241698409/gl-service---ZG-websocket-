@@ -19,7 +19,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
-@MapperScan(basePackages = "com.baosight.gl.mapper.db2", sqlSessionFactoryRef = "db2SqlSessionFactory")
+//basePackages = "com.baosight.gl.mapper.db2",
+@MapperScan(basePackages = "com.baosight.gl.mapper.db2",sqlSessionFactoryRef = "db2SqlSessionFactory")
 @SuppressWarnings("all")
 public class DataSourceConfig2 {
 
@@ -46,7 +47,7 @@ public class DataSourceConfig2 {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource);
         // mapper的xml形式文件位置必须要配置，不然将报错：no statement （这种错误也可能是mapper的xml中，namespace与项目的路径不一致导致）
-        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/db2/*.xml"));
+        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:mapper/db2/**.xml"));
         return bean.getObject();
     }
     @Bean(name = "db2JdbcTemplate")

@@ -11,29 +11,28 @@
 
 	<!-- 查询最新的气流场数据 -->
 	<select id="queryCurrentAirFlow" resultType="map" >
-		<!--SELECT TIMESTAMP('2023-12-01') AS timestamp_value FROM SYSIBM.SYSDUMMY1-->
-		select *
-		    ID,
-		    TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') as "INSERT_TIME",
-		    ORIGINAL_FILE_NAME,
-		    ORIGINAL_FILE_TIME,
-		    TARGET_FILE_PATH,
-		    TYPE,
-		    COUNT_START_TIME,
-		    COUNT_END_TIME,
-		    COUNT_TIME,
-		    ORIGINAL_MIN_VALUE,
-	        ORIGINAL_MAX_VALUE,
-	        COUNT_MIN_VALUE,
-	        COUNT_MAX_VALUE
-		from
-			GL.AIRFLOW_FIELD_INDEX
-		 where
-		TYPE = #{type}
-		  <if test="id != null and id != ''">
-			and ID = #{id}
-		  </if>
-		order by id desc fetch first 1 rows only
+ 		SELECT TIMESTAMP('2023-12-01') AS timestamp_value FROM SYSIBM.SYSDUMMY1
+<!--		select ID,-->
+<!--		    TO_CHAR(INSERT_TIME,'YYYY-MM-DD HH24:MI:SS') as "INSERT_TIME",-->
+<!--		    ORIGINAL_FILE_NAME,-->
+<!--		    ORIGINAL_FILE_TIME,-->
+<!--		    TARGET_FILE_PATH,-->
+<!--		    TYPE,-->
+<!--		    COUNT_START_TIME,-->
+<!--		    COUNT_END_TIME,-->
+<!--		    COUNT_TIME,-->
+<!--		    ORIGINAL_MIN_VALUE,-->
+<!--	        ORIGINAL_MAX_VALUE,-->
+<!--	        COUNT_MIN_VALUE,-->
+<!--	        COUNT_MAX_VALUE-->
+<!--		from-->
+<!--			GL.AIRFLOW_FIELD_INDEX-->
+<!--		 where-->
+<!--		TYPE = #{type}-->
+<!--		  <if test="id != null and id != ''">-->
+<!--			and ID = #{id}-->
+<!--		  </if>-->
+<!--		order by id desc fetch first 1 rows only-->
 	</select>
 	
 	<!-- 插入最新的气流场数据 -->

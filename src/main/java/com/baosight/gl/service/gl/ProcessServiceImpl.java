@@ -257,7 +257,7 @@ public class ProcessServiceImpl implements ProcessService {
 		// 返回
 		return BlastFurnaceRetList;
 	}
-	private double calculateAverageValue(HashMap BlastFurnaceMap, Set<Double> keySet, Map<Double, List<BlastFurnaceMode>>BlastFurnaceValueMap,Double nowheight,Double nowangle) {
+	private double calculateAverageValue2(HashMap BlastFurnaceMap, Set<Double> keySet, Map<Double, List<BlastFurnaceMode>>BlastFurnaceValueMap,Double nowheight,Double nowangle) {
 		// 获取上层和下层
 		List<Double> upperHeight = new ArrayList<>();
 		List<Double> lowerHeight = new ArrayList<>();
@@ -328,6 +328,132 @@ public class ProcessServiceImpl implements ProcessService {
 			}
 		}
 
+		// 计算上层和下层的平均值
+		double upperAverage = calculateAverage(upperValues);
+		double lowerAverage = calculateAverage(lowerValues);
+
+		// 返回平均值
+		return (upperAverage + lowerAverage) / 2;
+	}
+	private double calculateAverageValue(HashMap BlastFurnaceMap, Set<Double> keySet, Map<Double, List<BlastFurnaceMode>>BlastFurnaceValueMap,Double nowheight,Double nowangle) {
+		Object valueO=null;
+		Double valueD=0.0;
+		List<BlastFurnaceMode> upperBlastFurnaceValueList=null;
+		List<BlastFurnaceMode> lowerBlastFurnaceValueList=null;
+		// 获取上层和下层
+		List<Double> upperHeight = new ArrayList<>();
+		List<Double> lowerHeight = new ArrayList<>();
+
+		for (Double key : keySet) {
+			if (key < nowheight) {
+				lowerHeight.add(key);
+			} else if (key > nowheight) {
+				upperHeight.add(key);
+			}
+		}
+
+		// 对上层和下层排序（升序）
+		Collections.sort(upperHeight);
+		Collections.sort(lowerHeight);
+
+		// 获取上层和下层的每个角度对应的数值
+		List<Double> upperValues = new ArrayList<>();
+		List<Double> lowerValues = new ArrayList<>();
+		//需要先按照角度降序排序
+		if(upperHeight.size()>0) {
+			upperBlastFurnaceValueList = BlastFurnaceValueMap.get(upperHeight.get(0)).stream()
+					.sorted(Comparator.comparingDouble(BlastFurnaceMode::getAngle))
+					.collect(Collectors.toList());
+			;
+		}else {
+			double maxNumber = Double.MIN_VALUE;
+			for (double num : keySet) {
+				if (num > maxNumber) {
+					maxNumber = num;
+				}
+			}
+			upperBlastFurnaceValueList = BlastFurnaceValueMap.get(maxNumber).stream()
+					.sorted(Comparator.comparingDouble(BlastFurnaceMode::getAngle))
+					.collect(Collectors.toList());
+			;
+		}
+		if(lowerHeight.size()>0) {
+			lowerBlastFurnaceValueList = BlastFurnaceValueMap.get(lowerHeight.get(lowerHeight.size() - 1)).stream()
+					.sorted(Comparator.comparingDouble(BlastFurnaceMode::getAngle))
+					.collect(Collectors.toList());
+			;
+			;
+		}else {
+			double minNumber  = Double.MAX_VALUE;
+			for (double num : keySet) {
+				if (num < minNumber ) {
+					minNumber  = num;
+				}
+			}
+			lowerBlastFurnaceValueList = BlastFurnaceValueMap.get(minNumber ).stream()
+					.sorted(Comparator.comparingDouble(BlastFurnaceMode::getAngle))
+					.collect(Collectors.toList());
+			;
+		}
+		for (BlastFurnaceMode blastFurnaceMode : upperBlastFurnaceValueList) {
+			Double angle = blastFurnaceMode.getAngle();
+			if (angle>nowangle) {
+				valueO = BlastFurnaceMap.get(blastFurnaceMode.getField());
+				valueD = (valueO == null || " ".equals(valueO)) ? 0d : Double.valueOf(valueO.toString());
+				upperValues.add(valueD);
+				break;
+			}
+		}
+		int uppercount=0;
+		//没有处理0度的数据点
+		for (BlastFurnaceMode blastFurnaceMode : upperBlastFurnaceValueList) {
+			Double angle = blastFurnaceMode.getAngle();
+			if (angle<nowangle) {
+				uppercount++;
+			}else {
+//				if(uppercount!=0) {
+//					Object valueO = BlastFurnaceMap.get(upperBlastFurnaceValueList.get(uppercount - 1).getField());
+//					Double valueD = (valueO == null || " ".equals(valueO)) ? 0d : Double.valueOf(valueO.toString());
+//					upperValues.add(valueD);
+//				}
+				break;
+			}
+		}
+		if(uppercount==0){
+			uppercount=upperBlastFurnaceValueList.size();
+		}
+		valueO = BlastFurnaceMap.get(upperBlastFurnaceValueList.get(uppercount - 1).getField());
+		valueD = (valueO == null || " ".equals(valueO)) ? 0d : Double.valueOf(valueO.toString());
+		upperValues.add(valueD);
+		for (BlastFurnaceMode blastFurnaceMode : lowerBlastFurnaceValueList) {
+			Double angle = blastFurnaceMode.getAngle();
+			if (angle>nowangle) {
+				valueO = BlastFurnaceMap.get(blastFurnaceMode.getField());
+				valueD = (valueO == null || " ".equals(valueO)) ? 0d : Double.valueOf(valueO.toString());
+				lowerValues.add(valueD);
+				break;
+			}
+		}
+		int lowercount=0;
+		for (BlastFurnaceMode blastFurnaceMode : lowerBlastFurnaceValueList) {
+			Double angle = blastFurnaceMode.getAngle();
+			if (angle<nowangle) {
+				lowercount++;
+			}else {
+//				if(lowercount!=0) {
+//					 valueO = BlastFurnaceMap.get(lowerBlastFurnaceValueList.get(lowercount - 1).getField());
+//					 valueD = (valueO == null || " ".equals(valueO)) ? 0d : Double.valueOf(valueO.toString());
+//					lowerValues.add(valueD);
+//				}
+				break;
+			}
+		}
+		if(lowercount==0){
+			lowercount=lowerBlastFurnaceValueList.size();
+		}
+		valueO = BlastFurnaceMap.get(lowerBlastFurnaceValueList.get(lowercount - 1).getField());
+		valueD = (valueO == null || " ".equals(valueO)) ? 0d : Double.valueOf(valueO.toString());
+		lowerValues.add(valueD);
 		// 计算上层和下层的平均值
 		double upperAverage = calculateAverage(upperValues);
 		double lowerAverage = calculateAverage(lowerValues);

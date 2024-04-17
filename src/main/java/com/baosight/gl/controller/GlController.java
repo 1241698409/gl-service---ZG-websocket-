@@ -1,8 +1,11 @@
 package com.baosight.gl.controller;
 
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.*;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -56,6 +59,10 @@ public class GlController {
     HtMapper htMapper;
 //    @Autowired
 //    private JdbcTemplate jdbcTemplate;
+//        使用@Autowired注解来注入JdbcTemplate，并使用@Qualifier注解来指定数据源
+// 两种引入方法
+//@Resource(name = "secondJdbcTemplate")
+//private JdbcTemplate jdbcTemplate2;
     @Autowired
     @Qualifier("db1JdbcTemplate")
     JdbcTemplate jdbcTemplate1;
@@ -198,6 +205,8 @@ public class GlController {
             paramsMap.put("orderFetch", "order by resultId asc");
             // 根据参数查询ResultId集合
             List<HashMap> resultIdList = htMapper.queryCutoffResult(paramsMap);
+
+
             // 判断时间段内是否存在resultId
             if (resultIdList.size() == 0) {
                 // 处理startTimeValue、endTimeValue、resultIdRetList到retMap集合
@@ -341,7 +350,26 @@ public class GlController {
             return "500";
         }
     }
-
+    /**
+     * 查询出铁信号点，value=1：代表1号出铁口出铁
+     *
+     * @remark1：出铁信号点表为实时更新表，不存在历史回放查询
+     */
+    @CrossOrigin
+    @PostMapping("/queryCastIronTag2")
+    public String queryCastIronTag2() {
+        try {
+            // 查询出铁信号点
+            List<HashMap> castIronTagList = glService.queryCastIronTag2();
+            // 判空并重新赋值
+            castIronTagList = castIronTagList == null ? new ArrayList<>() : castIronTagList;
+            // 返回
+            return JSON.toJSONString(castIronTagList);
+        } catch (Exception e) {
+            // 返回错误码
+            return "500";
+        }
+    }
     /**
      * 查询38个风口信号点，value=1：代表风口启用,value=0：代表风口不启用
      *
@@ -379,22 +407,36 @@ public class GlController {
             // 声明参数
             HashMap paramsMap = resultId != null ? processService.getCutOff3ResultIdByResultId(resultId, 2) : new HashMap<>();
             paramsMap.put("rows", 1);
-//			// 指标、操炉参数、料线：T_CUTOFF_RESULT_CAL_2产量数据
+//            //产量：T_CUTOFF_RESULT_AVG_6
 //			HashMap FurnaceMaterialMap_1 = glService.queryFurnaceMaterial1(paramsMap);
 //			FurnaceMaterialMap_1 = FurnaceMaterialMap_1 == null ? new HashMap<>() : FurnaceMaterialMap_1;
-            // 指标、操炉参数、料线：T_CUTOFF_RESULT_AVG_4
+            // CO，送风流量，C02，H2,CH4：T_CUTOFF_RESULT_AVG_8
             HashMap FurnaceMaterialMap_2 = glService.queryFurnaceMaterial2(paramsMap);
             FurnaceMaterialMap_2 = FurnaceMaterialMap_2 == null ? new HashMap<>() : FurnaceMaterialMap_2;
-            // 指标、操炉参数、料线：T_CUTOFF_RESULT_AVG_3
+            // 全压差，理论燃烧温度，炉腹煤气量，鼓风动能，透气性指数：T_CUTOFF_RESULT_AVG_3
             HashMap FurnaceMaterialMap_3 = glService.queryFurnaceMaterial3(paramsMap);
             FurnaceMaterialMap_3 = FurnaceMaterialMap_3 == null ? new HashMap<>() : FurnaceMaterialMap_3;
-            // 指标、操炉参数、料线：T_CUTOFF_RESULT_CAL_21
+            // 喷煤流速/喷煤量：T_CUTOFF_RESULT_SUM
             HashMap FurnaceMaterialMap_4 = glService.queryFurnaceMaterial4(paramsMap);
             FurnaceMaterialMap_4 = FurnaceMaterialMap_4 == null ? new HashMap<>() : FurnaceMaterialMap_4;
+            //热风压力，冷风压力，T_CUTOFF_RESULT_AVG_5
             HashMap FurnaceMaterialMap_5 = glService.queryFurnaceMaterial5(paramsMap);
             FurnaceMaterialMap_5 = FurnaceMaterialMap_5 == null ? new HashMap<>() : FurnaceMaterialMap_5;
+            //炉顶压力 T_CUTOFF_RESULT_AVG_4
+            HashMap FurnaceMaterialMap_6 = glService.queryFurnaceMaterial6(paramsMap);
+            FurnaceMaterialMap_6 = FurnaceMaterialMap_6 == null ? new HashMap<>() : FurnaceMaterialMap_6;
+            //冷风温度，热风温度：T_CUTOFF_RESULT_AVG_6
+            HashMap FurnaceMaterialMap_7 = glService.queryFurnaceMaterial7(paramsMap);
+            FurnaceMaterialMap_7 = FurnaceMaterialMap_7 == null ? new HashMap<>() : FurnaceMaterialMap_7;
+            // 入炉焦比：T_MW_CHARGE_VALUE
             HashMap FurnaceMaterialMap_8 = glService.queryFurnaceMaterial8(paramsMap);
             FurnaceMaterialMap_8 = FurnaceMaterialMap_8 == null ? new HashMap<>() : FurnaceMaterialMap_8;
+            //富氧量，铁水温度，煤气，顶温，T_CUTOFF_RESULT_CAL_1
+            HashMap FurnaceMaterialMap_9 = glService.queryFurnaceMaterial9(paramsMap);
+            FurnaceMaterialMap_9 = FurnaceMaterialMap_9 == null ? new HashMap<>() : FurnaceMaterialMap_9;
+            // 风量，富养率，：T_CUTOFF_RESULT_AVG_10
+            HashMap FurnaceMaterialMap_10 = glService.queryFurnaceMaterial10(paramsMap);
+            FurnaceMaterialMap_10 = FurnaceMaterialMap_10 == null ? new HashMap<>() : FurnaceMaterialMap_10;
             // 声明FurnaceMaterialMap集合
             HashMap FurnaceMaterialMap = new HashMap<>();
             // 处理指标、操炉参数、料线数据项到FurnaceMaterialMap集合
@@ -403,7 +445,11 @@ public class GlController {
             FurnaceMaterialMap.putAll(FurnaceMaterialMap_3);
             FurnaceMaterialMap.putAll(FurnaceMaterialMap_4);
             FurnaceMaterialMap.putAll(FurnaceMaterialMap_5);
+            FurnaceMaterialMap.putAll(FurnaceMaterialMap_6);
+            FurnaceMaterialMap.putAll(FurnaceMaterialMap_7);
             FurnaceMaterialMap.putAll(FurnaceMaterialMap_8);
+            FurnaceMaterialMap.putAll(FurnaceMaterialMap_9);
+            FurnaceMaterialMap.putAll(FurnaceMaterialMap_10);
             // 声明参数key集合：26个数据项
             List<String> FurnaceMaterialKeyList = new ArrayList<>();
             // 产量
@@ -421,37 +467,37 @@ public class GlController {
             // 入炉燃料比
             FurnaceMaterialKeyList.add("RANLIAOBI");
             // co
-            FurnaceMaterialKeyList.add("RG5_BFG_TOP_GCO");
+            FurnaceMaterialKeyList.add("RG1_BFG_TOP_GCO");
             // 全压差
-            FurnaceMaterialKeyList.add("RG5_BFP_DIF_000");
+            FurnaceMaterialKeyList.add("RG1_BT0_C00_PD1");
             // 顶温
-            FurnaceMaterialKeyList.add("RG5_BFT_TOP_AVG");
+            FurnaceMaterialKeyList.add("CG1_BFT_GAS_000");
             // 风量
-            FurnaceMaterialKeyList.add("RG5_BFF_COL_001");
+            FurnaceMaterialKeyList.add("RG1_HSF_000_BLA");
             // 喷煤
-            FurnaceMaterialKeyList.add("RG5_BFF_COA_000");
+            FurnaceMaterialKeyList.add("RG1_OPF_PCI_000");
             // 富氧
-            FurnaceMaterialKeyList.add("RG5_HSF_000_GO2");
+            FurnaceMaterialKeyList.add("CG1_BFG_FO2_000");
             // 热风压力
-            FurnaceMaterialKeyList.add("RG5_BFP_HOT_001");
+            FurnaceMaterialKeyList.add("RG1_RFL_HOT_P00");
             // 理论燃烧
-            FurnaceMaterialKeyList.add("RG5_BFT_FIR_000");
+            FurnaceMaterialKeyList.add("RG1_BFT_FIR_000");
             // 炉腹煤气
-            FurnaceMaterialKeyList.add("RG5_BFN_LFM_101");
+            FurnaceMaterialKeyList.add("RG1_BFF_BSH_GAS");
             // 铁水
-            FurnaceMaterialKeyList.add("CG5_MDT_TSP_001");
+            FurnaceMaterialKeyList.add("CG1_CTK_WTP_000");
             // co2
-            FurnaceMaterialKeyList.add("RG5_BFG_TOP_CO2");
-            // ηCO氧化碳利用率
-            FurnaceMaterialKeyList.add("RG5_BFN_RCO_000");
-            // cct5
-            FurnaceMaterialKeyList.add("RG5_CRT_CCT_005");
+            FurnaceMaterialKeyList.add("RG1_BFG_TOP_CO2");
+            // CH4
+            FurnaceMaterialKeyList.add("RG1_BFG_TOP_CH4");
+            // H2
+            FurnaceMaterialKeyList.add("RG1_BFG_TOP_GH2");
             // 炉顶压力
-            FurnaceMaterialKeyList.add("RG5_BFP_TOP_AVG");
+            FurnaceMaterialKeyList.add("CG1_BFT_001_001");
             // 鼓风动能
-            FurnaceMaterialKeyList.add("RG5_BFN_GFD_001");
+            FurnaceMaterialKeyList.add("RG1_BFO_WIN_ENG");
             // 热风温度
-            FurnaceMaterialKeyList.add("RG5_HST_000_BLA");
+            FurnaceMaterialKeyList.add("RG1_RFL_CSZ_061");
             // k
             FurnaceMaterialKeyList.add("RG5_BFN_K00_001");
             // si
@@ -469,17 +515,17 @@ public class GlController {
             //xianliao
             FurnaceMaterialKeyList.add("xianliao");
             // 富氧率
-            FurnaceMaterialKeyList.add("RG5_BFR_GO2_000");
+            FurnaceMaterialKeyList.add("RG1_BT0_CSZ_25");
             //冷风温度
-            FurnaceMaterialKeyList.add("RG5_BFT_COL_001");
+            FurnaceMaterialKeyList.add("RG1_HST_COL_000");
             //送风流量
-            FurnaceMaterialKeyList.add("RG5_BFF_WIN_000");
+            FurnaceMaterialKeyList.add("RG1_LQS_CSZ_041");
             //冷风压力
-            FurnaceMaterialKeyList.add("RG5_HSP_000_COL");
-//煤气
-            FurnaceMaterialKeyList.add("RG5_BFG_TOP_CH4");
+            FurnaceMaterialKeyList.add("RG1_HSP_COL_000");
+//煤气利用率
+            FurnaceMaterialKeyList.add("CG1_BFR_TOP_ECO");
             //透气性指数
-            FurnaceMaterialKeyList.add("RG5_BFO_00K_001");
+            FurnaceMaterialKeyList.add("RG1_BFR_00K_000");
             // 声明FurnaceMaterialValueMap集合
             Map FurnaceMaterialValueMap = new HashMap<>();
             // 遍历FurnaceMaterialKeyList集合
@@ -522,8 +568,7 @@ public class GlController {
             // 声明tableNamesList集合
             List<String> tableNamesList = new ArrayList<String>();
             // 添加数据项到tableNamesList集合
-            tableNamesList.add("T_CUTOFF_RESULT_AVG_56");
-            tableNamesList.add("T_CUTOFF_RESULT_AVG_57");
+            tableNamesList.add("T_CUTOFF_RESULT_CAL_4");
             // BlastFurnaceList根据table字段分组
             BlastFurnaceModeMap = BlastFurnaceList.stream().collect(Collectors.groupingBy(BlastFurnaceMode::getTable));
             // 声明ThermalLoadTempMap集合
@@ -558,8 +603,8 @@ public class GlController {
 //			// 声明tableNamesList集合
             List<String> tableNamesListforTemp = new ArrayList<String>();
             // 添加数据项到tableNamesList集合
-            tableNamesListforTemp.add("T_CUTOFF_RESULT_AVG_54");
-            tableNamesListforTemp.add("T_CUTOFF_RESULT_AVG_55");
+            tableNamesListforTemp.add("T_CUTOFF_RESULT_AVG_8");
+            tableNamesListforTemp.add("T_CUTOFF_RESULT_AVG_9");
 //			tableNamesListforTemp.add("T_CUTOFF_RESULT_AVG_2");
 //			tableNamesListforTemp.add("T_CUTOFF_RESULT_AVG_10");
             // 声明ThermalLoadTempMap集合
@@ -622,8 +667,8 @@ public class GlController {
             // 声明tableNamesList集合
             List<String> tableNamesList = new ArrayList<String>();
             // 添加数据项到tableNamesList集合
-            tableNamesList.add("T_CUTOFF_RESULT_AVG_54");
-            tableNamesList.add("T_CUTOFF_RESULT_AVG_55");
+            tableNamesList.add("T_CUTOFF_RESULT_AVG_8");
+            tableNamesList.add("T_CUTOFF_RESULT_AVG_9");
 //			tableNamesList.add("T_CUTOFF_RESULT_AVG_2");
 //			tableNamesList.add("T_CUTOFF_RESULT_AVG_10");
             // 声明ThermalLoadTempMap集合
@@ -739,8 +784,7 @@ public class GlController {
             // 声明tableNamesList集合
             List<String> tableNamesList = new ArrayList<String>();
             // 添加数据项到tableNamesList集合
-            tableNamesList.add("T_CUTOFF_RESULT_AVG_56");
-            tableNamesList.add("T_CUTOFF_RESULT_AVG_57");
+            tableNamesList.add("T_CUTOFF_RESULT_CAL_4");
             // 声明ThermalLoadTempAllList集合
             List<HashMap> ThermalLoadTempAllList = new ArrayList<>();
             // 遍历tableNamesList集合
@@ -768,7 +812,7 @@ public class GlController {
                 HashMap ThermalLoadTempMap = new HashMap<>();
                 // 处理热负荷温度数据项到ThermalLoadTempMap集合
                 ThermalLoadTempMap.putAll(ThermalLoadTempAllList.subList(0, rows).get(i));
-                ThermalLoadTempMap.putAll(ThermalLoadTempAllList.subList(rows, rows * 2).get(i));
+//                ThermalLoadTempMap.putAll(ThermalLoadTempAllList.subList(rows, rows * tableNamesList.size()-1).get(i));
 //				ThermalLoadTempMap.putAll(ThermalLoadTempAllList.subList(120, 180).get(i));
                 // 处理ThermalLoadTempMap集合到ThermalLoadTempList集合
                 ThermalLoadTempList.add(ThermalLoadTempMap);
@@ -826,8 +870,8 @@ public class GlController {
         // 声明tableNamesList集合
         List<String> tableNamesList = new ArrayList<String>();
         // 添加数据项到tableNamesList集合
-        tableNamesList.add("T_CUTOFF_RESULT_AVG_54");
-        tableNamesList.add("T_CUTOFF_RESULT_AVG_55");
+        tableNamesList.add("T_CUTOFF_RESULT_AVG_8");
+        tableNamesList.add("T_CUTOFF_RESULT_AVG_9");
 //		tableNamesList.add("T_CUTOFF_RESULT_AVG_10");
         // 声明ThermalLoadTempAllList集合
         List<HashMap> ThermalLoadTempAllList = new ArrayList<>();
@@ -1395,7 +1439,7 @@ public class GlController {
             List<HashMap> HeatMapList = glService.queryHeatMapHistory(paramsMap);
             // 声明HeatMapValueList集合
             List<Object> HeatMapValueList = new ArrayList<>();
-            // 遍历HeatMapList(往前一天的数据量)集合 因为热力图的计算方式是当前一小时平均和前一天一小时的平均差值所以下面展示一天内的每个小时的均值
+            // 遍历HeatMapList(往前一天的数据量)集合 因为热力图的计算方式是当前一小时平均和前一天一小时的平均差值所以下面展示一天内的每个小时的均值（目前热负荷数据是当前10分钟和前一天10分钟的差值数据,趋势未修改）
             for (int startIndex = 0; startIndex < HeatMapList.size(); startIndex += 60) {
                 ArrayList HeatMapValue = new ArrayList<>();
                 // 每隔60条数据(一个小时)：处理成ValueList集合

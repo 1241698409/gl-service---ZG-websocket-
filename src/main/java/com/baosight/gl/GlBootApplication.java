@@ -23,6 +23,6 @@ import org.springframework.context.annotation.Import;
 //@SpringBootApplication
 public class GlBootApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(GlBootApplication.class, args);
+			SpringApplication.run(GlBootApplication.class, args);
 	}
 }

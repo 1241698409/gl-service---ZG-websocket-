@@ -35,7 +35,10 @@ public class GlServiceImpl implements GlService {
 	public List<HashMap> queryCastIronTag() {
 		return glMapper.queryCastIronTag();
 	}
-
+	@Override
+	public List<HashMap> queryCastIronTag2() {
+		return glMapper.queryCastIronTag2();
+	}
 	@Override
 	public List<HashMap> queryTuyereTag() {
 		return glMapper.queryTuyereTag();
@@ -80,7 +83,14 @@ public class GlServiceImpl implements GlService {
 	public HashMap queryFurnaceMaterial8(HashMap paramsMap) {
 		return glMapper.queryFurnaceMaterial8(paramsMap);
 	}
-
+	@Override
+	public HashMap queryFurnaceMaterial9(HashMap paramsMap) {
+		return glMapper.queryFurnaceMaterial9(paramsMap);
+	}
+	@Override
+	public HashMap queryFurnaceMaterial10(HashMap paramsMap) {
+		return glMapper.queryFurnaceMaterial10(paramsMap);
+	}
 	@Override
 	public List<HashMap> queryThermalLoad(HashMap paramsMap) {
 		return glMapper.queryThermalLoad(paramsMap);
@@ -167,7 +177,7 @@ public class GlServiceImpl implements GlService {
 
 	@Override
 	public List<HashMap> queryElevation() {
-		return glMapper.queryElevation();
+		return lgMapper.queryElevation();
 	}
 
 	@Override
@@ -177,7 +187,7 @@ public class GlServiceImpl implements GlService {
 
 	@Override
 	public List<HashMap> queryResidualThickness(HashMap paramsMap) {
-		return glMapper.queryResidualThickness(paramsMap);
+		return lgMapper.queryResidualThickness(paramsMap);
 	}
 	@Override
 	public List<HashMap> queryResidualThicknessHis(HashMap paramsMap) {

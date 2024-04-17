@@ -188,7 +188,7 @@ ${orderFetch}
 				LAYER.CHARGENO = INFO.CHARGENO
 		WHERE
 			LAYER.CLOCK = (SELECT MAX(CLOCK) FROM MD.T_MD_BODY_MAT_LAYER)
-		ORDER BY LEVEL ASC
+		ORDER BY LEVEL DESC
 	</select>
 
 	<!-- 查询侵蚀线、凝固线：角度数据项截取:之后的角度 -->

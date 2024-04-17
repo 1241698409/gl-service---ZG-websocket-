@@ -41,7 +41,14 @@
 			itemid ='2103'
 		order by TAPHOLEID asc
 	</select>
-
+	<select id="queryCastIronTag2" resultType="map">
+		select value as ironMouth
+		from T_TS_TAP_VALUE
+		where ITEMID = 2148
+		  and TAPNO = (select TAPNO as furnaceNumber
+					   from t_ts_tap
+					   order by TAPNO desc fetch first 1 row ONLY)
+	</select>
 	<!-- 查询38个风口信号点，value=1：代表风口启用,value=0：代表风口不启用 -->
 	<select id="queryTuyereTag" resultType="map">
 	select
@@ -75,24 +82,17 @@
     					  )
  	</select>
 
-    <!-- 2d面板：CO,全压差,喷煤,富氧量,富氧率，理论燃烧温度,co2,炉顶压力，热风温度,冷风压力,透气性指数 -->
+    <!-- 2d面板：CO，送风流量，C02,H2，CH4 -->
     <select id="queryFurnaceMaterial2" resultType="map">
 		SELECT
 			RESULTID,
-		    RG5_BFG_TOP_GCO,
-		RG5_BFP_DIF_000,
-		RG5_BFF_COA_000,
-		RG5_HSF_000_GO2,
-		RG5_BFR_GO2_000,
-		RG5_BFT_FIR_000,
-		RG5_BFG_TOP_CO2,
-		RG5_BFP_TOP_AVG,
-		RG5_HST_000_BLA,
-		RG5_HSP_000_COL,
-		RG5_BFO_00K_001,
-		RG5_BFG_TOP_CH4
+		RG1_BFG_TOP_GCO,
+		RG1_LQS_CSZ_041,
+		RG1_BFG_TOP_CO2,
+		RG1_BFG_TOP_GH2,
+		RG1_BFG_TOP_CH4
 		FROM
-			IPLATURE.T_CUTOFF_RESULT_AVG_4
+			IPLATURE.T_CUTOFF_RESULT_AVG_8
 	 	WHERE RESULTID in (
        					   select RESULTID from IPLATURE.T_CUTOFF_RESULT
     					   where CUTOFFID = 1
@@ -103,18 +103,15 @@
     					  )
     </select>
 
-    <!-- 2d面板：风量，热风压力，炉腹煤气量，cct5,鼓风动能，K,冷风温度,送风流量-->
+    <!-- 2d面板：全压差，理论燃烧温度，炉腹煤气量，鼓风动能，透气性指数-->
     <select id="queryFurnaceMaterial3" resultType="map">
 		SELECT
 			RESULTID,
-		RG5_BFF_COL_001,
-		RG5_BFP_HOT_001,
-		RG5_BFN_LFM_101,
-		RG5_CRT_CCT_005,
-		RG5_BFN_GFD_001,
-		RG5_BFN_K00_001,
-		RG5_BFT_COL_001,
-		RG5_BFF_WIN_000
+		RG1_BT0_C00_PD1,
+		RG1_BFT_FIR_000,
+		RG1_BFF_BSH_GAS,
+		RG1_BFO_WIN_ENG,
+		RG1_BFR_00K_000
 		FROM
 			IPLATURE.T_CUTOFF_RESULT_AVG_3
 	 	WHERE RESULTID in (
@@ -127,14 +124,13 @@
     					  )
     </select>
 
-    <!-- 2d面板：铁水温度，si -->
+    <!-- 2d面板：喷煤流速/喷煤量 -->
     <select id="queryFurnaceMaterial4" resultType="map">
 		SELECT
 			RESULTID,
-		CG5_MDT_TSP_001,
-		CG5_MDN_TSN_0SI
+		RG1_OPF_PCI_000
 		FROM
-			IPLATURE.T_CUTOFF_RESULT_CAL_21
+			IPLATURE.T_CUTOFF_RESULT_SUM
 	 	WHERE RESULTID in (
        					   select RESULTID from IPLATURE.T_CUTOFF_RESULT
     					   where CUTOFFID = 1
@@ -145,17 +141,14 @@
     					  )
     </select>
 
-  	<!-- 2d面板：炉顶压力、ηCO、CO、CO2,顶温 -->
+  	<!-- 2d面板：热风压力，冷风压力 -->
     <select id="queryFurnaceMaterial5" resultType="map">
 		SELECT
 			RESULTID,
--- 			RG6_BFP_TOP_ACT,
--- 			RG6_BFA_GCO_USE,
--- 			RG6_BFA_GCO_000,
--- 			RG6_BFA_CO2_000,
-		RG5_BFT_TOP_AVG
+		RG1_RFL_HOT_P00,
+		RG1_HSP_COL_000
 		FROM
-			IPLATURE.T_CUTOFF_RESULT_AVG_1
+			IPLATURE.T_CUTOFF_RESULT_AVG_5
 	 	WHERE RESULTID in (
        					   select RESULTID from IPLATURE.T_CUTOFF_RESULT
     					   where CUTOFFID = 1
@@ -166,13 +159,12 @@
     					  )
     </select>
 
-    <!-- 2d面板：△P -->
+    <!-- 2d面板：炉顶压力-->
     <select id="queryFurnaceMaterial6" resultType="map">
 		SELECT
-			 RESULTID,
-			 CG6_BFX_PRS_TOT
+			 RESULTID
 		FROM
-			IPLATURE.T_CUTOFF_RESULT_CAL_1
+			IPLATURE.T_CUTOFF_RESULT_AVG_4
 	 	WHERE RESULTID in (
        					   select RESULTID from IPLATURE.T_CUTOFF_RESULT
     					   where CUTOFFID = 1
@@ -183,20 +175,14 @@
     					  )
     </select>
 
-    <!-- 2d面板：K、炉腹煤气量、顶温-平均值、边缘四点温度、CCT、CCT2、鼓风动能、理论燃烧温度 -->
+    <!-- 2d面板：冷风温度，热风温度 -->
     <select id="queryFurnaceMaterial7" resultType="map">
 		SELECT
 			RESULTID,
-			RG6_0L2_CAL_002,
-			RG6_0L2_CAL_001,
-			RG6_BFT_TOP_AVG,
-			RG6_CRT_AVG_00O,
-			RG6_0L2_CCT_000,
-			RG6_0L2_CCT_002,
-			RG6_0L2_CAL_003,
-			RG6_0L2_CAL_005
+		RG1_RFL_CSZ_061,
+		RG1_HST_COL_000
 		FROM
-			IPLATURE.T_CUTOFF_RESULT_AVG_66
+			IPLATURE.T_CUTOFF_RESULT_AVG_6
 	 	WHERE RESULTID in (
        					   select RESULTID from IPLATURE.T_CUTOFF_RESULT
     					   where CUTOFFID = 1
@@ -223,7 +209,43 @@
 				and ITEMID in (10, 13, 15, 17, 18,36, 37, 38)
 			 ) as ic
     </select>
-
+	<!-- 2d面板：富氧量，铁水温度，煤气，顶温,炉顶压力 -->
+	<select id="queryFurnaceMaterial9" resultType="map">
+		SELECT
+		RESULTID,
+		CG1_BFG_FO2_000,
+		CG1_CTK_WTP_000,
+		CG1_BFR_TOP_ECO,
+		CG1_BFT_GAS_000,
+		CG1_BFT_GAS_000
+		FROM
+		IPLATURE.T_CUTOFF_RESULT_CAL_1
+		WHERE RESULTID in (
+		select RESULTID from IPLATURE.T_CUTOFF_RESULT
+		where CUTOFFID = 1
+		<if test="resultId != null and resultId != ''">
+			and RESULTID = #{resultId}
+		</if>
+		order by resultId desc fetch first ${rows} rows only
+		)
+	</select>
+<!--	风量，富养率-->
+	<select id="queryFurnaceMaterial10" resultType="map">
+		SELECT
+		RESULTID,
+		RG1_BT0_CSZ_25,
+		RG1_HSF_000_BLA
+		FROM
+		IPLATURE.T_CUTOFF_RESULT_AVG_10
+		WHERE RESULTID in (
+		select RESULTID from IPLATURE.T_CUTOFF_RESULT
+		where CUTOFFID = 1
+		<if test="resultId != null and resultId != ''">
+			and RESULTID = #{resultId}
+		</if>
+		order by resultId desc fetch first ${rows} rows only
+		)
+	</select>
 <!--    &lt;!&ndash; 热负荷数据项 &ndash;&gt;-->
 <!--    <select id="queryThermalLoad" resultType="map">-->
 <!--	    SELECT -->

@@ -47,6 +47,7 @@ public class DataSourceConfig1 {
 	/**
 	 * @param dataSource
 	 * @return
+	 *
 	 * @throws Exception
 	 */
 	@Primary
@@ -63,7 +64,7 @@ public class DataSourceConfig1 {
 		return new JdbcTemplate(dataSource);
 	}
 	/**
-	 * 
+	 * x
 	 * @param sqlSessionFactory
 	 * @return
 	 */

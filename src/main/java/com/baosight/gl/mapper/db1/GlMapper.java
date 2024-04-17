@@ -18,7 +18,7 @@ public interface GlMapper {
 	 * 查询出铁信号点
 	 */
 	List<HashMap> queryCastIronTag();
-
+	List<HashMap> queryCastIronTag2();
 	/**
 	 * 查询风口信号点
 	 */
@@ -63,7 +63,8 @@ public interface GlMapper {
 	 * 2d面板：喷煤
 	 */
 	HashMap queryFurnaceMaterial8(HashMap paramsMap);
-
+	HashMap queryFurnaceMaterial9(HashMap paramsMap);
+	HashMap queryFurnaceMaterial10(HashMap paramsMap);
 	/**
 	 * 热负荷数据项
 	 */
