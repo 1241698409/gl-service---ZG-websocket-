@@ -4,43 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="116ad274-ca1f-4f61-b78a-129bb9b7c4b9" name="Changes" comment="重钢修改读取execl文件判空&#10;修改历史回放json文件存储读取，以及多线程优化对比历史数据sql速度 增加炉缸侵蚀以及布料的接口">
+    <list default="true" id="116ad274-ca1f-4f61-b78a-129bb9b7c4b9" name="Changes" comment="重钢高炉本体websocket推送">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_boot_spring_boot_starter_websocket_2_1_3_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_messaging_5_1_5_RELEASE.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_springframework_spring_websocket_5_1_5_RELEASE.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/GlBootApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/GlBootApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/config/DataSourceConfig1.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/config/DataSourceConfig1.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/config/DataSourceConfig2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/config/DataSourceConfig2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gl-service.iml" beforeDir="false" afterPath="$PROJECT_DIR$/gl-service.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/controller/GlController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/controller/GlController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/mapper/db1/GlMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/mapper/db1/GlMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/GlService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/GlService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/GlServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/GlServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/ProcessServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/baosight/gl/service/gl/ProcessServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/db1/GlMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/db1/GlMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/db2/HtMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/db2/HtMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/mapper/db3/LGMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/mapper/db3/LGMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templateExcel/热负荷数据项_1.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templateExcel/热负荷数据项_1.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templateExcel/热负荷温度数据项_1.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templateExcel/热负荷温度数据项_1.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application-prod.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/config/DataSourceConfig2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/config/DataSourceConfig2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/config/DataSourceConfig1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/config/DataSourceConfig1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/controller/GlController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/controller/GlController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/mapper/db1/GlMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/mapper/db1/GlMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/GlService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/GlService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/GlServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/GlServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/ProcessServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/baosight/gl/service/gl/ProcessServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/mapper/db1/GlMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/db1/GlMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/mapper/db2/HtMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/db2/HtMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/mapper/db3/LGMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/mapper/db3/LGMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templateExcel/~$热电偶数据项.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templateExcel/压力数据项.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templateExcel/压力数据项.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templateExcel/炉身静压数据项.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templateExcel/炉身静压数据项.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templateExcel/热负荷数据项_1.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templateExcel/热负荷数据项_1.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/templateExcel/热负荷温度数据项_1.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templateExcel/热负荷温度数据项_1.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/gl-service-0.0.1-SNAPSHOT.jar.original" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,30 +62,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/iDEA/DEMO/gl-service -ZG - websocket推送&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;aa05890ccea0252953b225ac024229fc&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/iDEA/DEMO/gl-service -ZG - websocket推送",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "spring.configuration.checksum": "aa05890ccea0252953b225ac024229fc"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;db2&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "db2"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\iDEA\DEMO\gl-service -ZG\src\main\resources\mapper\db3" />
@@ -120,6 +93,7 @@
       <recent name="D:\iDEA\DEMO\gl-service\src\main\resources\templateExcel" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.baosight.gl.socket" />
       <recent name="com.baosight.gl.config" />
       <recent name="com.baosight.gl.mapper.db3" />
     </key>
@@ -369,6 +343,12 @@
       <workItem from="1711686992725" duration="10840000" />
       <workItem from="1711935377703" duration="6728000" />
       <workItem from="1713317920984" duration="1177000" />
+      <workItem from="1713319117565" duration="16245000" />
+      <workItem from="1713402463824" duration="12543000" />
+      <workItem from="1713750060319" duration="23917000" />
+      <workItem from="1713837778410" duration="5347000" />
+      <workItem from="1713920954231" duration="14672000" />
+      <workItem from="1714006985149" duration="8023000" />
     </task>
     <task id="LOCAL-00001" summary="第一次上传">
       <created>1698468361907</created>
@@ -454,7 +434,14 @@
       <option name="project" value="LOCAL" />
       <updated>1706001577363</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="重钢高炉本体websocket推送">
+      <created>1713319329565</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1713319329565</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -555,7 +542,8 @@
     <MESSAGE value="重钢修改等压线以及增加配置文件" />
     <MESSAGE value="重钢修改读取execl文件判空&#10;修改历史回放json文件存储读取，以及多线程优化对比历史数据sql速度" />
     <MESSAGE value="重钢修改读取execl文件判空&#10;修改历史回放json文件存储读取，以及多线程优化对比历史数据sql速度 增加炉缸侵蚀以及布料的接口" />
-    <option name="LAST_COMMIT_MESSAGE" value="重钢修改读取execl文件判空&#10;修改历史回放json文件存储读取，以及多线程优化对比历史数据sql速度 增加炉缸侵蚀以及布料的接口" />
+    <MESSAGE value="重钢高炉本体websocket推送" />
+    <option name="LAST_COMMIT_MESSAGE" value="重钢高炉本体websocket推送" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

@@ -23,6 +23,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import com.alibaba.fastjson.JSON;
@@ -40,6 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
+@Component
 @SuppressWarnings("all")
 public class GlController {
     @RequestMapping("/")
