@@ -172,18 +172,18 @@ ${orderFetch}
 			LAYER.C_THICK          AS "cThick",
 			LAYER.O_THICK          AS "oThick",
 			LAYER.FLAG             AS "flag",
-			INFO.CHARGENO          AS "chargeNo",
-			INFO.THEO_FE           AS "theoFe",
-			INFO.THEO_SLAG         AS "theoSlag",
-			INFO.COKE_RATIO        AS "cokeRatio",
-			INFO.COMPRE_COKE_RATIO AS "compreCokeRatio",
+			INFO.chargeNo          AS "chargeNo",
+			INFO.FE           AS "theoFe",
+			INFO.SLAG         AS "theoSlag",
+			INFO.CR        AS "cokeRatio",
+			INFO.CR_HOUR_AVG AS "compreCokeRatio",
 			INFO.R                 AS "r",
-			INFO.COKE_TOTAL        AS "cokeTotal",
+			INFO.COKE        AS "cokeTotal",
 			INFO.CHARGE_WGT        AS "chargeWgt"
 		FROM
 			MD.T_MD_BODY_MAT_LAYER LAYER
 				LEFT JOIN
-			MD.T_MD_BODY_CHARGE_CAL_INFO INFO
+			IPLATURE.T_MD_CHARGE_INFO INFO
 			ON
 				LAYER.CHARGENO = INFO.CHARGENO
 		WHERE

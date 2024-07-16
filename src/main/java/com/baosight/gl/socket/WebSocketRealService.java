@@ -31,7 +31,10 @@ public class WebSocketRealService extends AbstractWebSocketService {
     static CopyOnWriteArraySet<WebSocketRealService> copyOnWriteArraySet = new CopyOnWriteArraySet<>();
 
     static ConcurrentHashMap<Session, WebSocketRealService> concurrentHashMap = new ConcurrentHashMap();
-
+//使用了@ServerEndpoint注解的类中使用@Resource或@Autowired注入都会失败，并且报出空指针异常。
+//原因是WebSocket服务是线程安全的，那么当我们去发起一个ws连接时，就会创建一个端点对象。
+//WebSocket服务是多对象的，不是单例的。
+//而我们的Spring的Bean默认就是单例的，在非单例类中注入一个单例的Bean是冲突的。
     @Autowired
     GlController glController;
 

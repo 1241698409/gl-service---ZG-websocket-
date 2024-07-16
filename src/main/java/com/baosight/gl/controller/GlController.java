@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.*;
 import java.sql.Types;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -14,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import com.baosight.gl.mapper.db2.HtMapper;
+import com.baosight.gl.mapper.db4.LBMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.ss.usermodel.Row;
@@ -60,6 +62,8 @@ public class GlController {
     ProcessMapper processMapper;
     @Autowired
     HtMapper htMapper;
+    @Autowired
+    LBMapper LBMapper;
 //    @Autowired
 //    private JdbcTemplate jdbcTemplate;
 //        使用@Autowired注解来注入JdbcTemplate，并使用@Qualifier注解来指定数据源
@@ -1311,6 +1315,46 @@ public class GlController {
             ThermocoupleRetMap.putAll(ThermocoupleDealMap);
             // 返回
             return JSON.toJSONString(ThermocoupleRetMap);
+        } catch (Exception e) {
+            // 返回错误码
+            return "500";
+        }
+    }
+    /**
+     * 查询结厚数据项根据角度
+     *
+     * @param rows
+     * @remark1：传参rows：从当前时间查询rows行(热电偶)等温线历史数据项
+     */
+    @CrossOrigin
+    @PostMapping("/queryThicknessByAngle")
+    public String queryThicknessByAngle(String time, String angle) {
+        try {
+            // 声明ThermocoupleRetMap集合
+            Map<Object, Object> ThermocoupleRetMap = new LinkedHashMap<>();
+            // 设置参数
+            HashMap paramsMap = new HashMap<>();
+            if(time!=null) {
+                paramsMap.put("endTime", time);
+            }else {
+                paramsMap.put("endTime", LocalDate.now()+" 00:00:00");
+            }
+            if(angle!=null) {
+                paramsMap.put("angle", angle);
+            }else {
+                paramsMap.put("angle", 22);
+            }
+            paramsMap.put("orderFetch", "order by d.H desc");
+            // 声明HeatMapResultIdList集合
+            List<Integer> MapResultIdList = new ArrayList();
+            List<HashMap> ThicknessList = LBMapper.queryThicknessResult(paramsMap);
+//            SLAGTHICK为结厚大小，单位为mm
+            // 判断是否存在历史(热电偶)等温线数据项 || (热电偶)等温线数据项长度是否大于rows
+            if (ThicknessList.size() == 0) {
+                return JSON.toJSONString(ThicknessList);
+            }
+            // 返回
+            return JSON.toJSONString(ThicknessList);
         } catch (Exception e) {
             // 返回错误码
             return "500";

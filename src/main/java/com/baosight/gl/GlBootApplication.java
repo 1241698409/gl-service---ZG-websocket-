@@ -3,6 +3,7 @@ package com.baosight.gl;
 import com.baosight.gl.config.DataSourceConfig1;
 import com.baosight.gl.config.DataSourceConfig2;
 import com.baosight.gl.config.DataSourceConfig3;
+import com.baosight.gl.config.DataSourceConfig4;
 import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +19,7 @@ import org.springframework.context.annotation.Import;
 //多数据源不用加
 //@MapperScan("com.baosight.gl.mapper")
 //@SpringBootApplication(exclude = {MybatisAutoConfiguration.class})
-@Import({DataSourceConfig1.class, DataSourceConfig2.class, DataSourceConfig3.class})
+@Import({DataSourceConfig1.class, DataSourceConfig2.class, DataSourceConfig3.class, DataSourceConfig4.class})
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, MybatisAutoConfiguration.class})
 //@SpringBootApplication
 public class GlBootApplication {

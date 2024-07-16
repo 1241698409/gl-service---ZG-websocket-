@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.baosight.gl.mapper.db4.LBMapper">
+
+	 <!-- 查询T_CUTOFF_RESULT表数据项 -->
+     <select id="queryThicknessResult" resultType="map">
+		 select * from md.T_MDL_BF_WALL_RST_TENMIN AS t
+		     LEFT JOIN md.T_MDL_BF_WALL_DEFINE AS d
+		         ON t.COUPLEID =d.COUPLEID
+WHERE
+    1 = 1
+ <if test="angle != null and cutoffId != ''">
+	 AND d.ANGLE = ${angle}
+</if>
+<if test="endTime != null and endTime != ''">
+     AND clock =
+	(SELECT  CLOCK FROM md.T_MDL_BF_WALL_RST_TENMIN WHERE
+	            CLOCK<![CDATA[<=]]>#{endTime}
+	    order by clock DESC fetch FIRST 1 ROWS ONLY)
+</if>
+${orderFetch}
+</select>
+	<select id="queryThicknessResult2" resultType="map">
+		select * from md.T_MDL_BF_WALL_RST_TENMIN AS t
+		LEFT JOIN md.T_MDL_BF_WALL_DEFINE AS d
+		ON t.COUPLEID =d.COUPLEID
+	</select>
+</mapper>

@@ -194,21 +194,32 @@
     </select>
 
     <!-- 2d面板：入炉焦比 -->
-    <select id="queryFurnaceMaterial8" resultType="map">
-		select max(decode(ITEMID, 10, value, 0)) AS piliao,
-			   max(decode(ITEMID, 13, value, 0)) AS jiaotan,
-			   max(decode(ITEMID, 15, value, 0)) AS shaojie,
-			   max(decode(ITEMID, 17, value, 0)) AS qiutuan,
-			   max(decode(ITEMID, 18, value, 0)) AS PB,
-			   max(decode(ITEMID, 36, value, 0)) AS jiaobi,
-			   max(decode(ITEMID, 37, value, 0)) AS meibi,
-			   max(decode(ITEMID, 38, value, 0)) AS ranliaobi
+<!--    <select id="queryFurnaceMaterial8" resultType="map">-->
+<!--		select max(decode(ITEMID, 10, value, 0)) AS piliao,-->
+<!--			   max(decode(ITEMID, 13, value, 0)) AS jiaotan,-->
+<!--			   max(decode(ITEMID, 15, value, 0)) AS shaojie,-->
+<!--			   max(decode(ITEMID, 17, value, 0)) AS qiutuan,-->
+<!--			   max(decode(ITEMID, 18, value, 0)) AS PB,-->
+<!--			   max(decode(ITEMID, 36, value, 0)) AS jiaobi,-->
+<!--			   max(decode(ITEMID, 37, value, 0)) AS meibi,-->
+<!--			   max(decode(ITEMID, 38, value, 0)) AS ranliaobi-->
+<!--		from (select value, itemid-->
+<!--			  from IPLATURE.T_MW_CHARGE_VALUE-->
+<!--			  where CHARGENO = (select max(chargeno) from IPLATURE.T_MW_CHARGE_VALUE)-->
+<!--				and ITEMID in (10, 13, 15, 17, 18,36, 37, 38)-->
+<!--			 ) as ic-->
+<!--    </select>-->
+	<select id="queryFurnaceMaterial8" resultType="map">
+		select
+		max(decode(ITEMID, 231, value, 0)) AS jiaobi,
+		max(decode(ITEMID, 232, value, 0)) AS meibi,
+		max(decode(ITEMID, 233, value, 0)) AS ranliaobi
 		from (select value, itemid
-			  from IPLATURE.T_MW_CHARGE_VALUE
-			  where CHARGENO = (select max(chargeno) from IPLATURE.T_MW_CHARGE_VALUE)
-				and ITEMID in (10, 13, 15, 17, 18,36, 37, 38)
-			 ) as ic
-    </select>
+		from IPLATURE.T_CUTOFF_RESULT_VALUE tcrv
+		where RESULTID = (SELECT MAX(RESULTID) from IPLATURE.T_CUTOFF_RESULT tcr WHERE CLOCK <![CDATA[<]]> (SELECT VARCHAR_FORMAT(CURRENT DATE, 'YYYY-MM-DD') FROM SYSIBM.SYSDUMMY1))
+		and ITEMID in (231, 232, 233)
+		) as ic
+	</select>
 	<!-- 2d面板：富氧量，铁水温度，煤气，顶温,炉顶压力 -->
 	<select id="queryFurnaceMaterial9" resultType="map">
 		SELECT
